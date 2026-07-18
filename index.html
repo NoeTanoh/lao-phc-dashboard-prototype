@@ -3,272 +3,206 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Lao PDR 2025 PHC Dashboard Prototype</title>
+    <title>Lao PDR Census Atlas Prototype</title>
     <meta
       name="description"
-      content="Interactive prototype for the Lao PDR 2025 Population and Housing Census online dissemination dashboard."
+      content="Map-first interactive prototype for the Lao PDR 2025 Population and Housing Census online dissemination dashboard."
     />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <div class="app-shell">
-      <header class="topbar">
-        <a class="brand" href="#dashboard" aria-label="Go to dashboard">
+    <div class="atlas-shell">
+      <header class="atlas-topbar">
+        <a class="brand" href="#atlas" aria-label="Lao PHC Atlas home">
           <span class="brand-mark" aria-hidden="true">5</span>
           <span>
-            <strong data-i18n="brandTitle">Lao PHC 2025</strong>
-            <em data-i18n="brandSub">Online Census Dissemination Dashboard</em>
+            <strong>Lao PHC Atlas</strong>
+            <em>2025 Population and Housing Census</em>
           </span>
         </a>
 
-        <nav class="topnav" aria-label="Primary navigation">
-          <a href="#dashboard" data-i18n="navDashboard">Dashboard</a>
-          <a href="#explore" data-i18n="navExplore">Explore</a>
-          <a href="#crosstab" data-i18n="navCrosstab">Cross-tab</a>
-          <a href="#handover" data-i18n="navHandover">Delivery</a>
+        <nav class="nav-tabs" aria-label="Dashboard sections">
+          <a href="#atlas">Atlas</a>
+          <a href="#analysis">Analysis</a>
+          <a href="#crosstab">Cross-tab</a>
+          <a href="#handover">Handover</a>
         </nav>
 
         <div class="top-actions">
-          <button class="icon-button" id="printBtn" type="button" title="Print or save as PDF" aria-label="Print or save as PDF">
-            PDF
-          </button>
-          <div class="lang-switch" aria-label="Language switch">
-            <button class="active" id="langEn" type="button">EN</button>
-            <button id="langLo" type="button">LO</button>
-          </div>
+          <button id="printBtn" type="button">PDF</button>
+          <button id="langToggle" type="button">EN / LO</button>
         </div>
       </header>
 
       <main>
-        <section class="hero" id="dashboard">
-          <div class="hero-copy">
-            <p class="eyebrow" data-i18n="heroEyebrow">Official dissemination prototype</p>
-            <h1 data-i18n="heroTitle">From digital census data to decisions everyone can use.</h1>
-            <p data-i18n="heroBody">
-              A high-level web prototype for Lao Statistics Bureau and UNFPA: GIS drill-down, population pyramid,
-              trend comparison, confidential aggregated tables, exports, bilingual labels, and an embedded data assistant.
-            </p>
-            <div class="hero-actions">
-              <a class="primary-action" href="#explore" data-i18n="heroCta">Open live dashboard</a>
-              <button class="secondary-action" id="demoQuestionBtn" type="button" data-i18n="heroAsk">Ask the data assistant</button>
-            </div>
+        <section class="atlas-head" id="atlas">
+          <div>
+            <p class="overline">LSB / UNFPA dissemination prototype</p>
+            <h1>Lao PDR census atlas and evidence console</h1>
           </div>
-
-          <div class="hero-visual" aria-label="Lao PDR census operations overview">
-            <svg viewBox="0 0 580 600" role="img" aria-labelledby="heroMapTitle">
-              <title id="heroMapTitle">Stylized Lao PDR operational map</title>
-              <defs>
-                <linearGradient id="river" x1="0" x2="1" y1="0" y2="1">
-                  <stop offset="0" stop-color="#00a5b5" />
-                  <stop offset="1" stop-color="#0076a8" />
-                </linearGradient>
-                <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feDropShadow dx="0" dy="22" stdDeviation="22" flood-color="#001c30" flood-opacity=".18" />
-                </filter>
-              </defs>
-              <path
-                class="laos-silhouette"
-                d="M271 24c45 31 47 75 22 112 47 23 78 70 74 126-3 38-19 66-5 104 16 44 79 80 63 124-16 45-82 38-116 13-29-22-36-62-72-75-41-15-91 9-122-26-28-32 4-68 1-104-3-34-38-62-30-101 9-44 58-49 86-79 31-32 39-75 99-94z"
-                filter="url(#softShadow)"
-              />
-              <path class="mekong" d="M364 78c-51 48-54 97-27 148 31 59 15 102 51 150 23 31 62 50 58 103" />
-              <g id="heroProvinceDots"></g>
-            </svg>
-            <div class="hero-stats">
-              <div>
-                <span data-i18n="heroStat1Label">Enumerators</span>
-                <strong>12,000</strong>
-              </div>
-              <div>
-                <span data-i18n="heroStat2Label">Provinces</span>
-                <strong>18</strong>
-              </div>
-              <div>
-                <span data-i18n="heroStat3Label">Target coverage</span>
-                <strong>95%+</strong>
-              </div>
-            </div>
-          </div>
+          <p>
+            Real ADM1 province boundaries from geoBoundaries, synthetic aggregated indicators,
+            and a production-ready interaction model for official PHC dissemination.
+          </p>
         </section>
 
-        <section class="status-strip" aria-label="Dashboard status">
-          <div>
-            <span data-i18n="statusSource">Data mode</span>
-            <strong data-i18n="statusSynthetic">Synthetic aggregated demo</strong>
-          </div>
-          <div>
-            <span data-i18n="statusSecurity">Privacy</span>
-            <strong data-i18n="statusPrivacy">No microdata exposed</strong>
-          </div>
-          <div>
-            <span data-i18n="statusStack">Production target</span>
-            <strong>PostgreSQL + PostGIS + GeoJSON</strong>
-          </div>
-          <div>
-            <span data-i18n="statusDelivery">TOR window</span>
-            <strong>Aug-Nov 2026</strong>
-          </div>
+        <section class="control-ribbon" aria-label="Census filters">
+          <label>
+            Indicator
+            <select id="indicatorSelect"></select>
+          </label>
+          <label>
+            Province
+            <select id="provinceSelect"></select>
+          </label>
+          <label>
+            District
+            <select id="districtSelect"></select>
+          </label>
+          <label>
+            Population group
+            <select id="groupSelect">
+              <option value="all">All groups</option>
+              <option value="female">Women and girls</option>
+              <option value="youth">Youth under 30</option>
+              <option value="rural">Rural communities</option>
+              <option value="ethnic">Ethno-linguistic minorities</option>
+            </select>
+          </label>
+          <label>
+            Search
+            <input id="searchInput" type="search" placeholder="Find a province..." />
+          </label>
+          <button id="resetBtn" type="button">Reset</button>
         </section>
 
-        <section class="workspace" id="explore">
-          <aside class="filters" aria-label="Dashboard filters">
-            <div class="panel-heading">
+        <section class="atlas-workspace">
+          <aside class="metric-rail" id="metricRail" aria-label="Headline indicators"></aside>
+
+          <section class="map-stage" aria-label="Interactive real Lao PDR province map">
+            <div class="map-toolbar">
               <div>
-                <p class="eyebrow" data-i18n="filtersEyebrow">Global filters</p>
-                <h2 data-i18n="filtersTitle">Subset the census</h2>
+                <p class="overline">Official boundary layer</p>
+                <h2 id="mapTitle">Province map</h2>
               </div>
-              <button class="text-button" id="resetBtn" type="button" data-i18n="reset">Reset</button>
+              <div class="toolbar-actions">
+                <button id="downloadCsvBtn" type="button">CSV</button>
+                <button id="downloadJsonBtn" type="button">JSON</button>
+                <button id="downloadMapPngBtn" type="button">PNG map</button>
+              </div>
             </div>
-
-            <label>
-              <span data-i18n="indicator">Indicator</span>
-              <select id="indicatorSelect"></select>
-            </label>
-            <label>
-              <span data-i18n="province">Province</span>
-              <select id="provinceSelect"></select>
-            </label>
-            <label>
-              <span data-i18n="district">District</span>
-              <select id="districtSelect"></select>
-            </label>
-            <label>
-              <span data-i18n="sex">Sex</span>
-              <select id="sexSelect"></select>
-            </label>
-            <label>
-              <span data-i18n="area">Urban / rural</span>
-              <select id="areaSelect"></select>
-            </label>
-            <label>
-              <span data-i18n="ethno">Ethno-linguistic typology</span>
-              <select id="ethnoSelect"></select>
-            </label>
-            <label>
-              <span data-i18n="search">Search</span>
-              <input id="searchInput" type="search" placeholder="Vientiane, Luang Prabang, Savannakhet" />
-            </label>
-
-            <div class="download-dock">
-              <strong data-i18n="exports">Exports</strong>
-              <button id="downloadCsvBtn" type="button" data-i18n="downloadCsv">Download CSV</button>
-              <button id="downloadJsonBtn" type="button" data-i18n="downloadJson">Download JSON</button>
-              <button id="downloadMapPngBtn" type="button" data-i18n="downloadMap">Download map PNG</button>
+            <div class="map-canvas">
+              <svg id="laoMap" viewBox="0 0 760 920" role="img" aria-label="Lao PDR ADM1 choropleth map"></svg>
             </div>
-          </aside>
-
-          <section class="dashboard-main">
-            <div class="kpi-grid" id="kpiGrid"></div>
-
-            <div class="dashboard-grid">
-              <article class="map-panel">
-                <div class="panel-heading">
-                  <div>
-                    <p class="eyebrow" data-i18n="mapEyebrow">GIS-ready view</p>
-                    <h2 data-i18n="mapTitle">Province choropleth</h2>
-                  </div>
-                  <span class="chip" id="selectedScope">National</span>
-                </div>
-                <div class="map-wrap">
-                  <svg id="laoMap" viewBox="0 0 460 900" role="img" aria-label="Interactive Lao province map"></svg>
-                </div>
-                <div class="legend" id="mapLegend"></div>
-              </article>
-
-              <article class="insight-panel">
-                <div class="panel-heading">
-                  <div>
-                    <p class="eyebrow" data-i18n="insightEyebrow">Executive one-page</p>
-                    <h2 data-i18n="insightTitle">Headline intelligence</h2>
-                  </div>
-                </div>
-                <div class="insight-list" id="insightList"></div>
-              </article>
-            </div>
-
-            <div class="analytics-grid">
-              <article>
-                <div class="panel-heading">
-                  <div>
-                    <p class="eyebrow" data-i18n="pyramidEyebrow">Age and sex</p>
-                    <h2 data-i18n="pyramidTitle">Population pyramid</h2>
-                  </div>
-                </div>
-                <div id="pyramidChart" class="chart"></div>
-              </article>
-
-              <article>
-                <div class="panel-heading">
-                  <div>
-                    <p class="eyebrow" data-i18n="trendEyebrow">2015 vs 2025</p>
-                    <h2 data-i18n="trendTitle">Change over time</h2>
-                  </div>
-                </div>
-                <div id="trendChart" class="chart"></div>
-              </article>
+            <div class="map-footer">
+              <div id="mapLegend" class="legend"></div>
+              <p>Boundary source: geoBoundaries LAO ADM1. Values are synthetic aggregated demo indicators.</p>
             </div>
           </section>
+
+          <aside class="province-inspector">
+            <div class="inspector-main">
+              <p class="overline">Selected geography</p>
+              <h2 id="selectedName">Lao PDR</h2>
+              <p id="selectedNarrative">Select a province on the map to inspect headline census indicators.</p>
+            </div>
+            <div id="rankList" class="rank-list"></div>
+          </aside>
         </section>
 
-        <section class="crosstab-section" id="crosstab">
-          <div class="section-heading">
-            <p class="eyebrow" data-i18n="crosstabEyebrow">Technical users</p>
-            <h2 data-i18n="crosstabTitle">Custom cross-tabulation builder</h2>
-            <p data-i18n="crosstabBody">
-              Build publication-safe aggregated tables by dimension and indicator. Production data would be generated from approved tabulation matrices only.
-            </p>
-          </div>
+        <section class="analysis-board" id="analysis">
+          <article>
+            <div class="section-title">
+              <p class="overline">Age and sex</p>
+              <h2>Population pyramid</h2>
+            </div>
+            <div id="pyramidChart" class="pyramid-chart"></div>
+          </article>
 
-          <div class="crosstab-tools">
-            <label>
-              <span data-i18n="rows">Rows</span>
-              <select id="rowDimSelect"></select>
-            </label>
-            <label>
-              <span data-i18n="columns">Columns</span>
-              <select id="colDimSelect"></select>
-            </label>
-            <label>
-              <span data-i18n="measure">Measure</span>
-              <select id="measureSelect"></select>
-            </label>
-            <button class="primary-action compact" id="copyTableBtn" type="button" data-i18n="copyTable">Copy table</button>
-          </div>
+          <article>
+            <div class="section-title">
+              <p class="overline">2015 baseline vs 2025 demo</p>
+              <h2>Population change</h2>
+            </div>
+            <div id="trendChart" class="trend-chart"></div>
+          </article>
 
-          <div class="table-wrap">
-            <table id="crosstabTable"></table>
-          </div>
+          <article class="wide-panel" id="crosstab">
+            <div class="section-title">
+              <p class="overline">Publication-safe tables</p>
+              <h2>Cross-tabulation builder</h2>
+            </div>
+            <div class="table-controls">
+              <label>
+                Rows
+                <select id="rowDimSelect"></select>
+              </label>
+              <label>
+                Columns
+                <select id="colDimSelect"></select>
+              </label>
+              <label>
+                Measure
+                <select id="measureSelect"></select>
+              </label>
+              <button id="copyTableBtn" type="button">Copy table</button>
+            </div>
+            <div class="table-wrap">
+              <table id="crosstabTable"></table>
+            </div>
+          </article>
         </section>
 
-        <section class="handover" id="handover">
-          <div class="section-heading">
-            <p class="eyebrow" data-i18n="handoverEyebrow">TOR alignment</p>
-            <h2 data-i18n="handoverTitle">Built to answer the 32-day assignment.</h2>
+        <section class="handover-strip" id="handover">
+          <div>
+            <p class="overline">TOR response</p>
+            <h2>What this proves in a proposal</h2>
           </div>
-          <div class="timeline" id="timeline"></div>
+          <div id="deliveryGrid" class="delivery-grid"></div>
         </section>
       </main>
 
-      <aside class="assistant-panel" id="assistantPanel" aria-label="Data assistant">
-        <button class="assistant-toggle" id="assistantToggle" type="button" aria-expanded="false">
-          <span data-i18n="assistantToggle">Data assistant</span>
+      <aside class="chat-widget" id="chatWidget" aria-label="Census chat assistant">
+        <button class="chat-bubble" id="chatBubble" type="button" aria-expanded="false" aria-label="Open chat">
+          <svg viewBox="0 0 64 64" aria-hidden="true">
+            <circle cx="32" cy="32" r="30" fill="#fff" />
+            <path d="M18 18h26a5 5 0 0 1 5 5v18a5 5 0 0 1-5 5H31l-12 7v-7h-1a5 5 0 0 1-5-5V23a5 5 0 0 1 5-5z" fill="#52a895" />
+            <path d="M15 14h27a5 5 0 0 1 5 5v18a5 5 0 0 1-5 5H26l-11 7v-7a5 5 0 0 1-5-5V19a5 5 0 0 1 5-5z" fill="#6366f1" />
+            <circle cx="22" cy="28" r="3" fill="#fff" />
+            <circle cx="31" cy="28" r="3" fill="#fff" />
+            <circle cx="40" cy="28" r="3" fill="#fff" />
+          </svg>
         </button>
-        <div class="assistant-window" aria-live="polite">
-          <div class="assistant-head">
+
+        <section class="chat-panel" aria-live="polite">
+          <header class="chat-header">
             <div>
-              <strong data-i18n="assistantTitle">Census data assistant</strong>
-              <span data-i18n="assistantSub">Ask about indicators, exports, privacy, or provinces.</span>
+              <svg viewBox="0 0 32 32" aria-hidden="true">
+                <path d="M6 7h15a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3h-8l-7 4v-4a3 3 0 0 1-3-3V10a3 3 0 0 1 3-3z" fill="#6366f1" />
+                <circle cx="10" cy="15" r="1.5" fill="#fff" />
+                <circle cx="15" cy="15" r="1.5" fill="#fff" />
+                <circle cx="20" cy="15" r="1.5" fill="#fff" />
+              </svg>
+              <strong>Chat</strong>
             </div>
-            <button id="assistantClose" type="button" aria-label="Close assistant">x</button>
+            <button id="chatClose" type="button" aria-label="Close chat">x</button>
+          </header>
+
+          <div class="chat-empty">
+            <h2>Ask me anything about your report!</h2>
+            <p>Answers reflect your current filters and selected geography. If you change the map or filters, my answers change too.</p>
           </div>
+
           <div class="quick-prompts" id="quickPrompts"></div>
           <div class="messages" id="messages"></div>
-          <form class="assistant-form" id="assistantForm">
-            <input id="assistantInput" type="text" autocomplete="off" placeholder="Which province has the youngest population?" />
-            <button type="submit" data-i18n="send">Send</button>
+
+          <form class="chat-form" id="assistantForm">
+            <input id="assistantInput" type="text" autocomplete="off" placeholder="Ask anything..." />
+            <button type="submit" aria-label="Send message">↑</button>
           </form>
-        </div>
+          <p class="chat-disclaimer">Prototype AI can make mistakes. Please check important information.</p>
+        </section>
       </aside>
     </div>
 
