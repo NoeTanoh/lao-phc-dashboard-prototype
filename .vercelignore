@@ -1,7 +1,0 @@
-.git/
-.playwright-cli/
-tmp/
-output/
-data/raw/
-*.docx
-*.pdf

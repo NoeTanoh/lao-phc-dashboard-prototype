@@ -1,1355 +1,614 @@
-const DATA_URL = "./data/processed/round10_dashboard_data.json";
-const GEO_URL = "./data/geo/countries-110m.json";
+const PROVINCES = [
+  { id: "VTE-C", name: "Vientiane Capital", lao: "ນະຄອນຫຼວງວຽງຈັນ", pop2015: 821700, pop2025: 1074000, urban: 88, medianAge: 28.6, youth: 48, working: 68, literacy: 96, school: 84, water: 94, electricity: 99, internet: 72, disability: 2.9, migration: 12.4, tfr: 1.9, x: 242, y: 408, d: "M210 382 L282 373 L305 421 L264 463 L208 445 Z", districts: ["Chanthabouly", "Sikhottabong", "Xaysetha", "Sisattanak"] },
+  { id: "PHO", name: "Phongsaly", lao: "ຜົ້ງສາລີ", pop2015: 177900, pop2025: 197000, urban: 22, medianAge: 22.9, youth: 61, working: 56, literacy: 78, school: 63, water: 66, electricity: 76, internet: 29, disability: 3.7, migration: -1.8, tfr: 3.2, x: 238, y: 54, d: "M214 18 L267 31 L283 83 L240 111 L196 88 Z", districts: ["Phongsaly", "May", "Boun Nuea", "Yot Ou"] },
+  { id: "LNT", name: "Luang Namtha", lao: "ຫຼວງນ້ຳທາ", pop2015: 175800, pop2025: 205000, urban: 27, medianAge: 23.8, youth: 59, working: 58, literacy: 82, school: 67, water: 72, electricity: 82, internet: 34, disability: 3.2, migration: 2.1, tfr: 2.9, x: 158, y: 96, d: "M119 58 L196 88 L201 143 L147 166 L95 119 Z", districts: ["Luang Namtha", "Sing", "Long", "Viengphoukha"] },
+  { id: "OUD", name: "Oudomxay", lao: "ອຸດົມໄຊ", pop2015: 307600, pop2025: 349000, urban: 25, medianAge: 24.1, youth: 57, working: 59, literacy: 84, school: 69, water: 71, electricity: 84, internet: 36, disability: 3.3, migration: 1.4, tfr: 2.8, x: 195, y: 164, d: "M147 166 L201 143 L255 162 L244 224 L174 225 Z", districts: ["Xay", "La", "Namor", "Nga"] },
+  { id: "BOK", name: "Bokeo", lao: "ບໍ່ແກ້ວ", pop2015: 179300, pop2025: 220000, urban: 31, medianAge: 24.6, youth: 55, working: 60, literacy: 86, school: 70, water: 76, electricity: 86, internet: 39, disability: 3.1, migration: 4.8, tfr: 2.7, x: 92, y: 179, d: "M56 132 L119 142 L174 225 L102 254 L52 206 Z", districts: ["Houayxay", "Tonpheung", "Meung", "Pha Oudom"] },
+  { id: "LPB", name: "Luang Prabang", lao: "ຫຼວງພະບາງ", pop2015: 431900, pop2025: 483000, urban: 33, medianAge: 25.7, youth: 53, working: 61, literacy: 88, school: 73, water: 80, electricity: 88, internet: 44, disability: 3.0, migration: 3.1, tfr: 2.5, x: 252, y: 235, d: "M244 224 L307 210 L339 267 L303 322 L232 304 L174 225 Z", districts: ["Luang Prabang", "Xieng Ngeun", "Pak Ou", "Chomphet"] },
+  { id: "HOU", name: "Houaphanh", lao: "ຫົວພັນ", pop2015: 289400, pop2025: 310000, urban: 18, medianAge: 24.9, youth: 56, working: 58, literacy: 81, school: 66, water: 69, electricity: 80, internet: 31, disability: 3.8, migration: -2.9, tfr: 2.9, x: 355, y: 201, d: "M307 143 L386 155 L419 221 L365 274 L339 267 L307 210 Z", districts: ["Xam Neua", "Viengxay", "Huameuang", "Sop Bao"] },
+  { id: "XAY", name: "Xayaboury", lao: "ໄຊຍະບູລີ", pop2015: 382200, pop2025: 421000, urban: 27, medianAge: 26.5, youth: 51, working: 62, literacy: 89, school: 74, water: 82, electricity: 90, internet: 43, disability: 3.0, migration: 0.8, tfr: 2.4, x: 139, y: 303, d: "M102 254 L174 225 L232 304 L202 384 L112 371 L72 302 Z", districts: ["Xayaboury", "Khop", "Hongsa", "Phieng"] },
+  { id: "XKH", name: "Xiengkhouang", lao: "ຊຽງຂວາງ", pop2015: 244700, pop2025: 280000, urban: 29, medianAge: 25.4, youth: 54, working: 61, literacy: 86, school: 72, water: 75, electricity: 86, internet: 41, disability: 3.4, migration: 1.2, tfr: 2.6, x: 350, y: 325, d: "M303 322 L365 274 L421 326 L396 382 L323 382 Z", districts: ["Pek", "Kham", "Phoukout", "Nong Het"] },
+  { id: "VTE-P", name: "Vientiane Province", lao: "ວຽງຈັນ", pop2015: 419100, pop2025: 506000, urban: 39, medianAge: 27.2, youth: 49, working: 64, literacy: 91, school: 78, water: 86, electricity: 94, internet: 50, disability: 2.8, migration: 5.9, tfr: 2.2, x: 248, y: 354, d: "M232 304 L303 322 L323 382 L282 373 L210 382 L202 384 Z", districts: ["Vang Vieng", "Phonhong", "Thoulakhom", "Keo Oudom"] },
+  { id: "BOL", name: "Bolikhamxay", lao: "ບໍລິຄຳໄຊ", pop2015: 273700, pop2025: 323000, urban: 30, medianAge: 26.3, youth: 50, working: 63, literacy: 90, school: 76, water: 84, electricity: 92, internet: 47, disability: 2.9, migration: 4.3, tfr: 2.3, x: 344, y: 421, d: "M323 382 L396 382 L430 445 L365 492 L305 421 Z", districts: ["Paksan", "Thaphabath", "Pak Kading", "Viengthong"] },
+  { id: "KHM", name: "Khammouane", lao: "ຄຳມ່ວນ", pop2015: 392100, pop2025: 456000, urban: 31, medianAge: 26.8, youth: 49, working: 64, literacy: 91, school: 77, water: 84, electricity: 93, internet: 49, disability: 2.8, migration: 3.6, tfr: 2.2, x: 342, y: 507, d: "M305 421 L365 492 L403 545 L340 582 L284 526 L264 463 Z", districts: ["Thakhek", "Mahaxay", "Nongbok", "Hinboun"] },
+  { id: "SVK", name: "Savannakhet", lao: "ສະຫວັນນະເຂດ", pop2015: 969700, pop2025: 1102000, urban: 35, medianAge: 27.0, youth: 48, working: 65, literacy: 92, school: 79, water: 86, electricity: 94, internet: 52, disability: 2.7, migration: 2.7, tfr: 2.1, x: 268, y: 564, d: "M206 504 L284 526 L340 582 L310 638 L232 621 L178 560 Z", districts: ["Kaysone Phomvihane", "Outhoumphone", "Songkhone", "Atsaphangthong"] },
+  { id: "SRV", name: "Salavan", lao: "ສາລະວັນ", pop2015: 397000, pop2025: 454000, urban: 23, medianAge: 24.8, youth: 55, working: 59, literacy: 83, school: 68, water: 73, electricity: 84, internet: 36, disability: 3.2, migration: -0.4, tfr: 2.8, x: 221, y: 639, d: "M178 560 L232 621 L229 690 L154 688 L128 620 Z", districts: ["Salavan", "Lao Ngam", "Ta Oy", "Vapy"] },
+  { id: "XEK", name: "Xekong", lao: "ເຊກອງ", pop2015: 113000, pop2025: 133000, urban: 20, medianAge: 23.6, youth: 58, working: 57, literacy: 79, school: 64, water: 68, electricity: 79, internet: 30, disability: 3.6, migration: 0.6, tfr: 3.0, x: 303, y: 687, d: "M229 690 L310 638 L360 703 L314 747 L240 737 Z", districts: ["Lamam", "Kaleum", "Dakcheung", "Thateng"] },
+  { id: "CHP", name: "Champasak", lao: "ຈຳປາສັກ", pop2015: 694000, pop2025: 794000, urban: 41, medianAge: 27.5, youth: 47, working: 65, literacy: 92, school: 80, water: 88, electricity: 95, internet: 55, disability: 2.6, migration: 3.9, tfr: 2.1, x: 216, y: 759, d: "M154 688 L240 737 L248 826 L166 859 L104 780 Z", districts: ["Pakse", "Champasak", "Pathoumphone", "Khong"] },
+  { id: "ATP", name: "Attapeu", lao: "ອັດຕະປື", pop2015: 139600, pop2025: 168000, urban: 24, medianAge: 24.3, youth: 56, working: 59, literacy: 82, school: 67, water: 72, electricity: 83, internet: 34, disability: 3.4, migration: 2.4, tfr: 2.8, x: 318, y: 800, d: "M248 826 L314 747 L382 809 L341 875 L276 879 Z", districts: ["Samakkhixay", "Xaysetha", "Sanamxay", "Phouvong"] },
+  { id: "XSB", name: "Xaisomboun", lao: "ໄຊສົມບູນ", pop2015: 85800, pop2025: 103000, urban: 18, medianAge: 23.9, youth: 57, working: 58, literacy: 82, school: 66, water: 70, electricity: 82, internet: 33, disability: 3.4, migration: 1.7, tfr: 2.9, x: 292, y: 366, d: "M282 373 L323 382 L305 421 L282 410 Z", districts: ["Anouvong", "Thathom", "Longchaeng", "Hom"] },
+];
 
-const METRICS = {
-  right_direction_pct: {
-    label: "Country going in the right direction",
-    short: "Right direction",
-    polarity: "positive",
-    unit: "%",
-  },
-  wrong_direction_pct: {
-    label: "Country going in the wrong direction",
-    short: "Wrong direction",
-    polarity: "negative",
-    unit: "%",
-  },
-  economy_good_pct: {
-    label: "Economy described as good",
-    short: "Economy good",
-    polarity: "positive",
-    unit: "%",
-  },
-  economy_bad_pct: {
-    label: "Economy described as bad",
-    short: "Economy bad",
-    polarity: "negative",
-    unit: "%",
-  },
-  living_conditions_good_pct: {
-    label: "Living conditions described as good",
-    short: "Living good",
-    polarity: "positive",
-    unit: "%",
-  },
-  living_conditions_bad_pct: {
-    label: "Living conditions described as bad",
-    short: "Living bad",
-    polarity: "negative",
-    unit: "%",
-  },
-  mobile_phone_access_yes_pct: {
-    label: "Respondent has mobile phone access",
-    short: "Mobile access",
-    polarity: "positive",
-    unit: "%",
-  },
+const INDICATORS = {
+  pop2025: { label: "Population 2025", lao: "ປະຊາກອນ 2025", unit: "", format: "number", polarity: "neutral" },
+  growth: { label: "Population growth 2015-2025", lao: "ການເຕີບໂຕ 2015-2025", unit: "%", format: "percent", polarity: "neutral" },
+  urban: { label: "Urban share", lao: "ສັດສ່ວນເມືອງ", unit: "%", format: "percent", polarity: "neutral" },
+  youth: { label: "Population under 30", lao: "ປະຊາກອນຕ່ຳກວ່າ 30 ປີ", unit: "%", format: "percent", polarity: "neutral" },
+  working: { label: "Working-age population", lao: "ປະຊາກອນວັຍແຮງງານ", unit: "%", format: "percent", polarity: "positive" },
+  literacy: { label: "Adult literacy", lao: "ການຮູ້ໜັງສືຜູ້ໃຫຍ່", unit: "%", format: "percent", polarity: "positive" },
+  school: { label: "School attendance 6-17", lao: "ການເຂົ້າໂຮງຮຽນ 6-17", unit: "%", format: "percent", polarity: "positive" },
+  water: { label: "Improved drinking water", lao: "ນ້ຳດື່ມປັບປຸງ", unit: "%", format: "percent", polarity: "positive" },
+  internet: { label: "Internet access", lao: "ການເຂົ້າເຖິງອິນເຕີເນັດ", unit: "%", format: "percent", polarity: "positive" },
+  tfr: { label: "Total fertility rate", lao: "ອັດຕາເກີດລວມ", unit: "", format: "decimal", polarity: "neutral" },
 };
 
-const COORDS = {
-  ANG: [17.9, -11.2],
-  BEN: [2.3, 9.3],
-  BOT: [24.7, -22.2],
-  CAM: [12.4, 5.6],
-  CBZ: [15.8, -0.2],
-  CDI: [-5.5, 7.5],
-  CVE: [-24.0, 16.0],
-  GAB: [11.6, -0.8],
-  GAM: [-15.3, 13.4],
-  GHA: [-1.0, 7.9],
-  GUI: [-10.9, 10.4],
-  LES: [28.2, -29.6],
-  LIB: [-9.4, 6.4],
-  MAD: [46.9, -18.8],
-  MAU: [57.5, -20.2],
-  MLI: [-3.9, 17.5],
-  MLW: [34.3, -13.2],
-  MOR: [-7.1, 31.8],
-  MTA: [-10.9, 20.3],
-  NAM: [18.5, -22.9],
-  NIG: [8.7, 9.1],
-  STP: [6.6, 0.2],
-  TOG: [1.1, 8.6],
-  TUN: [9.0, 34.0],
-  ZAM: [27.8, -13.1],
-  ZIM: [29.2, -19.0],
-};
-
-const AFRICA_MAIN = [
-  [-17.5, 37.2],
-  [-8.5, 36.0],
-  [1.0, 36.8],
-  [10.5, 37.2],
-  [20.0, 33.0],
-  [29.0, 31.0],
-  [32.5, 27.5],
-  [31.0, 24.0],
-  [35.2, 21.5],
-  [40.8, 14.8],
-  [49.8, 11.4],
-  [51.4, 5.4],
-  [47.0, 2.0],
-  [43.5, 0.0],
-  [46.6, -6.5],
-  [43.0, -11.8],
-  [39.5, -17.0],
-  [35.2, -22.4],
-  [31.2, -28.5],
-  [27.4, -33.8],
-  [20.0, -34.8],
-  [15.5, -30.2],
-  [13.0, -25.4],
-  [8.2, -21.2],
-  [4.0, -18.2],
-  [0.8, -13.6],
-  [-5.4, -8.5],
-  [-8.8, -2.0],
-  [-13.0, 4.2],
-  [-16.0, 10.4],
-  [-17.2, 17.8],
-  [-14.0, 25.0],
-  [-17.5, 37.2],
-];
-
-const MADAGASCAR = [
-  [47.0, -12.2],
-  [49.4, -16.0],
-  [50.0, -21.8],
-  [47.5, -25.5],
-  [44.8, -23.0],
-  [44.5, -17.0],
-  [47.0, -12.2],
-];
-
-const EURASIA_HINT = [
-  [-10, 36],
-  [2, 47],
-  [18, 46],
-  [31, 42],
-  [44, 36],
-  [55, 30],
-  [52, 22],
-  [43, 25],
-  [34, 30],
-  [26, 33],
-  [12, 35],
-  [-2, 36],
-  [-10, 36],
-];
-
-const SOUTH_AMERICA_HINT = [
-  [-82, 10],
-  [-64, 8],
-  [-46, -5],
-  [-38, -22],
-  [-52, -55],
-  [-66, -45],
-  [-76, -18],
-  [-82, 10],
-];
-
-const AFRICA_FEATURE_NAMES = new Set([
-  "Algeria",
-  "Angola",
-  "Benin",
-  "Botswana",
-  "Burkina Faso",
-  "Burundi",
-  "Cameroon",
-  "Central African Rep.",
-  "Chad",
-  "Congo",
-  "Côte d'Ivoire",
-  "Dem. Rep. Congo",
-  "Djibouti",
-  "Egypt",
-  "Eq. Guinea",
-  "Eritrea",
-  "Ethiopia",
-  "Gabon",
-  "Gambia",
-  "Ghana",
-  "Guinea",
-  "Guinea-Bissau",
-  "Kenya",
-  "Lesotho",
-  "Liberia",
-  "Libya",
-  "Madagascar",
-  "Malawi",
-  "Mali",
-  "Mauritania",
-  "Morocco",
-  "Mozambique",
-  "Namibia",
-  "Niger",
-  "Nigeria",
-  "Rwanda",
-  "Senegal",
-  "Sierra Leone",
-  "Somalia",
-  "Somaliland",
-  "South Africa",
-  "S. Sudan",
-  "Sudan",
-  "Tanzania",
-  "Togo",
-  "Tunisia",
-  "Uganda",
-  "W. Sahara",
-  "Zambia",
-  "Zimbabwe",
-  "eSwatini",
-]);
-
-const DATA_TO_GEO_NAME = {
-  "Cabo Verde": "Cape Verde",
-  "Congo-Brazzaville": "Congo",
-  "Cote dIvoire": "Côte d'Ivoire",
-  "Sao Tome and Principe": "São Tomé and Principe",
-  "The Gambia": "Gambia",
+const TRANSLATIONS = {
+  en: {
+    brandTitle: "Lao PHC 2025",
+    brandSub: "Online Census Dissemination Dashboard",
+    navDashboard: "Dashboard",
+    navExplore: "Explore",
+    navCrosstab: "Cross-tab",
+    navHandover: "Delivery",
+    heroEyebrow: "Official dissemination prototype",
+    heroTitle: "From digital census data to decisions everyone can use.",
+    heroBody: "A high-level web prototype for Lao Statistics Bureau and UNFPA: GIS drill-down, population pyramid, trend comparison, confidential aggregated tables, exports, bilingual labels, and an embedded data assistant.",
+    heroCta: "Open live dashboard",
+    heroAsk: "Ask the data assistant",
+    heroStat1Label: "Enumerators",
+    heroStat2Label: "Provinces",
+    heroStat3Label: "Target coverage",
+    statusSource: "Data mode",
+    statusSynthetic: "Synthetic aggregated demo",
+    statusSecurity: "Privacy",
+    statusPrivacy: "No microdata exposed",
+    statusStack: "Production target",
+    statusDelivery: "TOR window",
+    filtersEyebrow: "Global filters",
+    filtersTitle: "Subset the census",
+    reset: "Reset",
+    indicator: "Indicator",
+    province: "Province",
+    district: "District",
+    sex: "Sex",
+    area: "Urban / rural",
+    ethno: "Ethno-linguistic typology",
+    search: "Search",
+    exports: "Exports",
+    downloadCsv: "Download CSV",
+    downloadJson: "Download JSON",
+    downloadMap: "Download map PNG",
+    mapEyebrow: "GIS-ready view",
+    mapTitle: "Province choropleth",
+    insightEyebrow: "Executive one-page",
+    insightTitle: "Headline intelligence",
+    pyramidEyebrow: "Age and sex",
+    pyramidTitle: "Population pyramid",
+    trendEyebrow: "2015 vs 2025",
+    trendTitle: "Change over time",
+    crosstabEyebrow: "Technical users",
+    crosstabTitle: "Custom cross-tabulation builder",
+    crosstabBody: "Build publication-safe aggregated tables by dimension and indicator. Production data would be generated from approved tabulation matrices only.",
+    rows: "Rows",
+    columns: "Columns",
+    measure: "Measure",
+    copyTable: "Copy table",
+    handoverEyebrow: "TOR alignment",
+    handoverTitle: "Built to answer the 32-day assignment.",
+    assistantToggle: "Data assistant",
+    assistantTitle: "Census data assistant",
+    assistantSub: "Ask about indicators, exports, privacy, or provinces.",
+    send: "Send",
+  },
+  lo: {
+    brandTitle: "ສຳມະໂນປະຊາກອນ ລາວ 2025",
+    brandSub: "ແຜງຂໍ້ມູນອອນລາຍ",
+    navDashboard: "ແຜງຄວບຄຸມ",
+    navExplore: "ສຳຫຼວດ",
+    navCrosstab: "ຕາຕະລາງຂ້າມ",
+    navHandover: "ການສົ່ງມອບ",
+    heroEyebrow: "ຕົ້ນແບບການເຜີຍແຜ່ຂໍ້ມູນ",
+    heroTitle: "ຈາກຂໍ້ມູນສຳມະໂນດິຈິຕອນ ໄປສູ່ການຕັດສິນໃຈ.",
+    heroBody: "ຕົ້ນແບບແຜງຂໍ້ມູນລະດັບສູງສຳລັບ LSB ແລະ UNFPA: ແຜນທີ່ GIS, ພີຣາມິດປະຊາກອນ, ແນວໂນ້ມ, ຕາຕະລາງລວມ, ການສົ່ງອອກ, ແລະຜູ້ຊ່ວຍຂໍ້ມູນ.",
+    heroCta: "ເປີດແຜງຂໍ້ມູນ",
+    heroAsk: "ຖາມຜູ້ຊ່ວຍຂໍ້ມູນ",
+    heroStat1Label: "ຜູ້ສຳຫຼວດ",
+    heroStat2Label: "ແຂວງ",
+    heroStat3Label: "ເປົ້າໝາຍຄອບຄຸມ",
+    statusSource: "ໂໝດຂໍ້ມູນ",
+    statusSynthetic: "ຂໍ້ມູນລວມສັງເຄາະ",
+    statusSecurity: "ຄວາມລັບ",
+    statusPrivacy: "ບໍ່ເປີດເຜີຍ microdata",
+    statusStack: "ເປົ້າໝາຍ production",
+    statusDelivery: "ໄລຍະ TOR",
+    filtersEyebrow: "ຕົວກອງຫຼັກ",
+    filtersTitle: "ກອງຂໍ້ມູນສຳມະໂນ",
+    reset: "ຕັ້ງຄ່າໃໝ່",
+    indicator: "ຕົວຊີ້ວັດ",
+    province: "ແຂວງ",
+    district: "ເມືອງ",
+    sex: "ເພດ",
+    area: "ເມືອງ / ຊົນນະບົດ",
+    ethno: "ກຸ່ມພາສາ-ຊົນເຜົ່າ",
+    search: "ຄົ້ນຫາ",
+    exports: "ສົ່ງອອກ",
+    downloadCsv: "ດາວໂຫຼດ CSV",
+    downloadJson: "ດາວໂຫຼດ JSON",
+    downloadMap: "ດາວໂຫຼດແຜນທີ່ PNG",
+    mapEyebrow: "ພ້ອມສຳລັບ GIS",
+    mapTitle: "ແຜນທີ່ຕາມແຂວງ",
+    insightEyebrow: "ສຳລັບຜູ້ບໍລິຫານ",
+    insightTitle: "ຂໍ້ມູນສຳຄັນ",
+    pyramidEyebrow: "ອາຍຸ ແລະ ເພດ",
+    pyramidTitle: "ພີຣາມິດປະຊາກອນ",
+    trendEyebrow: "2015 ທຽບ 2025",
+    trendTitle: "ການປ່ຽນແປງ",
+    crosstabEyebrow: "ຜູ້ໃຊ້ເຕັກນິກ",
+    crosstabTitle: "ສ້າງຕາຕະລາງຂ້າມ",
+    crosstabBody: "ສ້າງຕາຕະລາງລວມທີ່ປອດໄພສຳລັບການເຜີຍແຜ່.",
+    rows: "ແຖວ",
+    columns: "ຖັນ",
+    measure: "ຄ່າວັດ",
+    copyTable: "ຄັດລອກຕາຕະລາງ",
+    handoverEyebrow: "ສອດຄ່ອງ TOR",
+    handoverTitle: "ອອກແບບເພື່ອຕອບໂຈດ 32 ວັນ.",
+    assistantToggle: "ຜູ້ຊ່ວຍຂໍ້ມູນ",
+    assistantTitle: "ຜູ້ຊ່ວຍຂໍ້ມູນສຳມະໂນ",
+    assistantSub: "ຖາມເລື່ອງຕົວຊີ້ວັດ, export, privacy ຫຼື ແຂວງ.",
+    send: "ສົ່ງ",
+  },
 };
 
 const state = {
-  metric: "right_direction_pct",
-  country: "Malawi",
-  compare: "Nigeria",
-  segment: "Gender",
+  lang: "en",
+  indicator: "pop2025",
+  province: "all",
+  district: "all",
+  sex: "all",
+  area: "all",
+  ethno: "all",
   search: "",
+  rowDim: "province",
+  colDim: "area",
+  measure: "pop2025",
 };
 
-let store = {
-  countries: [],
-  segments: [],
-  regions: [],
-  metadata: [],
-  geoFeatures: [],
-  africaFeatures: [],
+const dims = {
+  province: ["All provinces", ...PROVINCES.map((p) => p.name)],
+  area: ["Urban", "Rural"],
+  sex: ["Male", "Female"],
+  ethno: ["Lao-Tai", "Mon-Khmer", "Hmong-Mien", "Sino-Tibetan"],
+  age: ["0-14", "15-29", "30-59", "60+"],
 };
 
-const globe = {
-  canvas: document.getElementById("globeCanvas"),
-  ctx: null,
-  currentLon: 24,
-  currentLat: 0,
-  targetLon: 24,
-  targetLat: 0,
-  orbit: 0,
-  raf: null,
-};
+const colors = ["#e8f5f9", "#b9e2eb", "#7bc7d7", "#2fa4bc", "#0076a8", "#004e75"];
 
-const els = {
-  metricSelect: document.getElementById("metricSelect"),
-  countrySelect: document.getElementById("countrySelect"),
-  compareSelect: document.getElementById("compareSelect"),
-  segmentSelect: document.getElementById("segmentSelect"),
-  searchInput: document.getElementById("searchInput"),
-  resetBtn: document.getElementById("resetBtn"),
-  downloadCsvBtn: document.getElementById("downloadCsvBtn"),
-  downloadMapBtn: document.getElementById("downloadMapBtn"),
-  printReportBtn: document.getElementById("printReportBtn"),
-  statusCountryCount: document.getElementById("statusCountryCount"),
-  activeFilters: document.getElementById("activeFilters"),
-  kpiRow: document.getElementById("kpiRow"),
-  mapContainer: document.getElementById("mapContainer"),
-  mapLegend: document.getElementById("mapLegend"),
-  rankingTitle: document.getElementById("rankingTitle"),
-  rankingCount: document.getElementById("rankingCount"),
-  rankingList: document.getElementById("rankingList"),
-  profileTitle: document.getElementById("profileTitle"),
-  profileMeta: document.getElementById("profileMeta"),
-  profileBars: document.getElementById("profileBars"),
-  compareTitle: document.getElementById("compareTitle"),
-  compareBars: document.getElementById("compareBars"),
-  segmentTitle: document.getElementById("segmentTitle"),
-  segmentBars: document.getElementById("segmentBars"),
-  regionTitle: document.getElementById("regionTitle"),
-  regionMetricHead: document.getElementById("regionMetricHead"),
-  regionRows: document.getElementById("regionRows"),
-  insights: document.getElementById("insights"),
-  toast: document.getElementById("toast"),
-  globeCountry: document.getElementById("globeCountry"),
-  globeMeta: document.getElementById("globeMeta"),
-  distributionChart: document.getElementById("distributionChart"),
-  scatterChart: document.getElementById("scatterChart"),
-  storyMetric: document.getElementById("storyMetric"),
-  storyRank: document.getElementById("storyRank"),
-  storyDelta: document.getElementById("storyDelta"),
-  dataTooltip: document.getElementById("dataTooltip"),
-};
+function growth(p) {
+  return ((p.pop2025 - p.pop2015) / p.pop2015) * 100;
+}
 
-init();
+function val(p, key) {
+  if (key === "growth") return growth(p);
+  return p[key];
+}
 
-async function init() {
-  bindEvents();
-  try {
-    const [response, geoResponse] = await Promise.all([fetch(DATA_URL), fetch(GEO_URL)]);
-    if (!response.ok) throw new Error(`Data request failed: ${response.status}`);
-    const data = await response.json();
-    const topology = geoResponse.ok ? await geoResponse.json() : null;
-    const geoFeatures =
-      topology && window.topojson ? window.topojson.feature(topology, topology.objects.countries).features : [];
-    store = {
-      countries: data.countries || [],
-      segments: data.segments || [],
-      regions: data.regions || [],
-      metadata: data.metadata || [],
-      geoFeatures,
-      africaFeatures: geoFeatures.filter(isAfricaFeature),
-    };
-    populateControls();
-    render();
-    showToast("Dashboard data loaded");
-  } catch (error) {
-    renderError(error);
+function fmt(value, key = state.indicator) {
+  const meta = INDICATORS[key] || {};
+  if (meta.format === "number") return Math.round(value).toLocaleString();
+  if (meta.format === "decimal") return Number(value).toFixed(1);
+  return `${Number(value).toFixed(value >= 10 ? 0 : 1)}${meta.unit || ""}`;
+}
+
+function label(key) {
+  const meta = INDICATORS[key];
+  return state.lang === "lo" ? meta.lao : meta.label;
+}
+
+function provinceLabel(p) {
+  return state.lang === "lo" ? p.lao : p.name;
+}
+
+function national(key) {
+  if (key === "pop2025") return PROVINCES.reduce((sum, p) => sum + p.pop2025, 0);
+  if (key === "growth") {
+    const now = PROVINCES.reduce((sum, p) => sum + p.pop2025, 0);
+    const then = PROVINCES.reduce((sum, p) => sum + p.pop2015, 0);
+    return ((now - then) / then) * 100;
   }
+  const total = PROVINCES.reduce((sum, p) => sum + p.pop2025, 0);
+  return PROVINCES.reduce((sum, p) => sum + val(p, key) * p.pop2025, 0) / total;
 }
 
-function bindEvents() {
-  bindTooltipEvents();
-
-  els.metricSelect.addEventListener("change", (event) => {
-    state.metric = event.target.value;
-    render();
+function filteredProvinces() {
+  const q = state.search.trim().toLowerCase();
+  return PROVINCES.filter((p) => {
+    const matchProvince = state.province === "all" || p.id === state.province;
+    const matchSearch = !q || p.name.toLowerCase().includes(q) || p.lao.includes(q);
+    return matchProvince && matchSearch;
   });
-
-  els.countrySelect.addEventListener("change", (event) => {
-    state.country = event.target.value;
-    if (state.compare === state.country) {
-      state.compare = getFallbackCompare(state.country);
-      els.compareSelect.value = state.compare;
-    }
-    render();
-  });
-
-  els.compareSelect.addEventListener("change", (event) => {
-    state.compare = event.target.value;
-    render();
-  });
-
-  els.segmentSelect.addEventListener("change", (event) => {
-    state.segment = event.target.value;
-    render();
-  });
-
-  els.searchInput.addEventListener("input", (event) => {
-    state.search = event.target.value.trim();
-    const exactOrSingle = getFilteredCountries();
-    if (exactOrSingle.length === 1) {
-      state.country = exactOrSingle[0].country;
-      if (state.compare === state.country) state.compare = getFallbackCompare(state.country);
-      syncControls();
-    }
-    render();
-  });
-
-  els.resetBtn.addEventListener("click", () => {
-    state.metric = "right_direction_pct";
-    state.country = "Malawi";
-    state.compare = "Nigeria";
-    state.segment = "Gender";
-    state.search = "";
-    syncControls();
-    render();
-  });
-
-  els.downloadCsvBtn.addEventListener("click", downloadCurrentCsv);
-  els.downloadMapBtn.addEventListener("click", downloadMapSvg);
-  els.printReportBtn.addEventListener("click", () => window.print());
 }
 
-function populateControls() {
-  els.metricSelect.innerHTML = Object.entries(METRICS)
-    .map(([key, metric]) => `<option value="${key}">${metric.label}</option>`)
-    .join("");
-
-  const countryOptions = store.countries
-    .slice()
-    .sort((a, b) => a.country.localeCompare(b.country))
-    .map((row) => `<option value="${escapeAttr(row.country)}">${escapeHtml(displayCountry(row.country))}</option>`)
-    .join("");
-
-  els.countrySelect.innerHTML = countryOptions;
-  els.compareSelect.innerHTML = countryOptions;
-  syncControls();
-  els.statusCountryCount.textContent = `${store.countries.length} countries loaded`;
+function activeProvince() {
+  return PROVINCES.find((p) => p.id === state.province) || null;
 }
 
-function syncControls() {
-  els.metricSelect.value = state.metric;
-  els.countrySelect.value = state.country;
-  els.compareSelect.value = state.compare;
-  els.segmentSelect.value = state.segment;
-  els.searchInput.value = state.search;
+function populateSelects() {
+  const indicatorSelect = document.querySelector("#indicatorSelect");
+  indicatorSelect.innerHTML = Object.entries(INDICATORS).map(([key]) => `<option value="${key}">${label(key)}</option>`).join("");
+  indicatorSelect.value = state.indicator;
+
+  const provinceSelect = document.querySelector("#provinceSelect");
+  provinceSelect.innerHTML = `<option value="all">${state.lang === "lo" ? "ທັງປະເທດ" : "National"}</option>` + PROVINCES.map((p) => `<option value="${p.id}">${provinceLabel(p)}</option>`).join("");
+  provinceSelect.value = state.province;
+
+  populateDistricts();
+
+  fillSimpleSelect("#sexSelect", [["all", state.lang === "lo" ? "ທັງໝົດ" : "All"], ["male", state.lang === "lo" ? "ຊາຍ" : "Male"], ["female", state.lang === "lo" ? "ຍິງ" : "Female"]], state.sex);
+  fillSimpleSelect("#areaSelect", [["all", state.lang === "lo" ? "ທັງໝົດ" : "All"], ["urban", state.lang === "lo" ? "ເມືອງ" : "Urban"], ["rural", state.lang === "lo" ? "ຊົນນະບົດ" : "Rural"]], state.area);
+  fillSimpleSelect("#ethnoSelect", [["all", state.lang === "lo" ? "ທັງໝົດ" : "All"], ["lao-tai", "Lao-Tai"], ["mon-khmer", "Mon-Khmer"], ["hmong-mien", "Hmong-Mien"], ["sino-tibetan", "Sino-Tibetan"]], state.ethno);
+
+  fillSimpleSelect("#rowDimSelect", [["province", "Province"], ["area", "Urban/Rural"], ["sex", "Sex"], ["ethno", "Ethno-linguistic"], ["age", "Age group"]], state.rowDim);
+  fillSimpleSelect("#colDimSelect", [["area", "Urban/Rural"], ["sex", "Sex"], ["ethno", "Ethno-linguistic"], ["age", "Age group"]], state.colDim);
+  document.querySelector("#measureSelect").innerHTML = Object.entries(INDICATORS).map(([key]) => `<option value="${key}">${label(key)}</option>`).join("");
+  document.querySelector("#measureSelect").value = state.measure;
 }
 
-function render() {
-  if (!store.countries.length) return;
-  const filtered = getFilteredCountries();
-  const focus = getCountry(state.country) || filtered[0] || store.countries[0];
-  const compare = getCountry(state.compare) || getCountry(getFallbackCompare(focus.country));
-
-  updateGlobeTarget(focus);
-  renderStoryStrip(filtered, focus, compare);
-  renderActiveFilters(filtered);
-  renderKpis(filtered, focus);
-  renderMap(filtered, focus);
-  renderRanking(filtered);
-  renderDistribution(filtered, focus);
-  renderScatter(focus);
-  renderProfile(focus);
-  renderComparison(focus, compare);
-  renderSegments(focus);
-  renderRegions(focus);
-  renderInsights(filtered, focus, compare);
+function fillSimpleSelect(selector, options, value) {
+  const el = document.querySelector(selector);
+  el.innerHTML = options.map(([key, text]) => `<option value="${key}">${text}</option>`).join("");
+  el.value = value;
 }
 
-function getFilteredCountries() {
-  const term = state.search.toLowerCase();
-  return store.countries
-    .filter((row) => !term || row.country.toLowerCase().includes(term) || row.country_code.toLowerCase().includes(term))
-    .sort((a, b) => Number(b[state.metric] || -1) - Number(a[state.metric] || -1));
+function populateDistricts() {
+  const p = activeProvince();
+  const districtSelect = document.querySelector("#districtSelect");
+  const all = state.lang === "lo" ? "ທຸກເມືອງ" : "All districts";
+  const districts = p ? p.districts : ["All provinces first"];
+  districtSelect.innerHTML = `<option value="all">${all}</option>` + districts.map((d) => `<option value="${d}">${d}</option>`).join("");
+  districtSelect.value = districts.includes(state.district) ? state.district : "all";
 }
 
-function getCountry(name) {
-  return store.countries.find((row) => row.country === name);
+function renderHeroDots() {
+  const dots = document.querySelector("#heroProvinceDots");
+  dots.innerHTML = PROVINCES.map((p, i) => {
+    const x = 86 + (p.x / 460) * 330;
+    const y = 18 + (p.y / 890) * 540;
+    return `<circle class="hero-dot" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${i % 5 === 0 ? 7 : 5}" fill="${i % 3 === 0 ? "#d4212f" : "#0076a8"}" style="animation-delay:${i * 90}ms" />`;
+  }).join("");
 }
 
-function getFallbackCompare(country) {
-  const fallback = store.countries.find((row) => row.country !== country && row.country === "Ghana");
-  return fallback?.country || store.countries.find((row) => row.country !== country)?.country || country;
-}
-
-function renderStoryStrip(rows, focus, compare) {
-  const metric = METRICS[state.metric];
-  const ranking = store.countries.slice().sort((a, b) => Number(b[state.metric] || 0) - Number(a[state.metric] || 0));
-  const rank = ranking.findIndex((row) => row.country === focus.country) + 1;
-  const delta = Math.abs(Number(focus[state.metric] || 0) - Number(compare[state.metric] || 0));
-
-  els.storyMetric.textContent = metric.short;
-  els.storyRank.textContent = rank > 0 ? `${rank}/${ranking.length}` : "-";
-  els.storyDelta.textContent = `${delta.toFixed(1)} pts`;
-}
-
-function renderActiveFilters(filtered) {
-  const metric = METRICS[state.metric];
-  els.activeFilters.innerHTML = [
-    `Indicator: ${metric.short}`,
-    `Focus: ${displayCountry(state.country)}`,
-    `Compare: ${displayCountry(state.compare)}`,
-    `Segment: ${state.segment}`,
-    `${filtered.length} countries`,
-  ]
-    .map((label) => `<span class="chip">${escapeHtml(label)}</span>`)
-    .join("");
-}
-
-function renderKpis(rows, focus) {
-  const metric = METRICS[state.metric];
-  const weighted = weightedAverage(rows, state.metric);
-  const high = maxBy(rows, state.metric);
-  const low = minBy(rows, state.metric);
-  const respondents = rows.reduce((sum, row) => sum + Number(row.respondents || 0), 0);
-  const focusValue = formatPercent(focus[state.metric]);
-
-  const items = [
-    ["Average", formatPercent(weighted), metric.short],
-    ["Highest country", high ? formatPercent(high[state.metric]) : "-", high ? displayCountry(high.country) : "-"],
-    ["Lowest country", low ? formatPercent(low[state.metric]) : "-", low ? displayCountry(low.country) : "-"],
-    ["Focus country", focusValue, displayCountry(focus.country)],
-    ["Respondents", formatNumber(respondents), "Filtered sample base"],
+function renderKpis() {
+  const pop = activeProvince() ? activeProvince().pop2025 : national("pop2025");
+  const kpis = [
+    [state.lang === "lo" ? "ປະຊາກອນ" : "Population", fmt(pop, "pop2025"), state.lang === "lo" ? "ຂໍ້ມູນລວມ" : "Aggregated records"],
+    [state.lang === "lo" ? "ເຕີບໂຕ" : "Growth", fmt(activeProvince() ? growth(activeProvince()) : national("growth"), "growth"), "2015-2025"],
+    [state.lang === "lo" ? "ອາຍຸກາງ" : "Median age", fmt(activeProvince() ? activeProvince().medianAge : national("medianAge"), "tfr"), state.lang === "lo" ? "ປີ" : "years"],
+    [label(state.indicator), fmt(activeProvince() ? val(activeProvince(), state.indicator) : national(state.indicator), state.indicator), state.lang === "lo" ? "ຕາມຕົວກອງ" : "Current scope"],
   ];
-
-  els.kpiRow.style.gridTemplateColumns = `repeat(${items.length}, minmax(140px, 1fr))`;
-  els.kpiRow.innerHTML = items
-    .map(
-      ([label, value, note]) => `
-        <div class="kpi">
-          <span>${escapeHtml(label)}</span>
-          <strong>${escapeHtml(value)}</strong>
-          <small>${escapeHtml(note)}</small>
-        </div>
-      `
-    )
-    .join("");
+  document.querySelector("#kpiGrid").innerHTML = kpis.map(([title, value, note]) => `<div class="kpi"><span>${title}</span><strong>${value}</strong><em>${note}</em></div>`).join("");
 }
 
-function renderMap(rows, focus) {
-  if (window.d3 && store.geoFeatures.length) {
-    renderRealAfricaMap(rows, focus);
-    return;
-  }
-  const rowByCode = new Map(rows.map((row) => [row.country_code, row]));
-  const width = 620;
-  const height = 540;
-  const dots = store.countries
-    .filter((row) => COORDS[row.country_code])
-    .map((row) => {
-      const [lon, lat] = COORDS[row.country_code];
-      const x = (lon + 26) * 7.85;
-      const y = (36 - lat) * 7.25;
-      const value = row[state.metric];
-      const active = rowByCode.has(row.country_code);
-      const selected = row.country === focus.country;
-      const tooltip = tooltipHtml(
-        displayCountry(row.country),
-        `${METRICS[state.metric].short}: ${formatPercent(value)}<br>Respondents: ${formatNumber(row.respondents)}`
-      );
-      return `
-        <g class="country-node" data-country="${escapeAttr(row.country)}" data-tooltip="${escapeAttr(tooltip)}" tabindex="0" role="button" aria-label="${escapeAttr(displayCountry(row.country))} ${formatPercent(value)}">
-          <title>${escapeHtml(displayCountry(row.country))} - ${escapeHtml(METRICS[state.metric].short)}: ${formatPercent(value)}</title>
-          <circle class="country-dot ${selected ? "is-selected" : ""}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${selected ? 12 : 8}" fill="${colorFor(value, METRICS[state.metric].polarity)}" opacity="${active ? 0.95 : 0.2}"></circle>
-          ${selected || value >= 70 || value <= 15 ? `<text class="country-label" x="${(x + 12).toFixed(1)}" y="${(y - 9).toFixed(1)}">${escapeHtml(row.country_code)}</text>` : ""}
-        </g>
-      `;
-    })
-    .join("");
-
-  els.mapContainer.innerHTML = `
-    <svg id="africaMap" viewBox="0 0 ${width} ${height}" role="img" aria-label="Dot map of African countries in this prototype">
-      <path class="map-outline" d="${flatPath(AFRICA_MAIN)}"></path>
-      <path class="map-outline" d="${flatPath(MADAGASCAR)}"></path>
-      <g>${dots}</g>
-    </svg>
+function renderMap() {
+  const values = PROVINCES.map((p) => val(p, state.indicator));
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const svg = document.querySelector("#laoMap");
+  svg.innerHTML = `
+    <rect width="460" height="660" fill="transparent"></rect>
+    <path d="M358 30 C318 89 324 138 353 193 C388 259 362 329 398 401 C424 453 452 495 434 608" fill="none" stroke="#00a5b5" stroke-width="8" stroke-linecap="round" opacity=".45"></path>
+    ${PROVINCES.map((p) => {
+      const t = (val(p, state.indicator) - min) / Math.max(1, max - min);
+      const color = colors[Math.min(colors.length - 1, Math.floor(t * colors.length))];
+      const active = state.province === p.id ? " active" : "";
+      return `<path class="province-shape${active}" data-id="${p.id}" d="${p.d}" fill="${color}"><title>${provinceLabel(p)} - ${fmt(val(p, state.indicator), state.indicator)}</title></path>
+      <text class="province-label" x="${p.x}" y="${p.y}">${p.id}</text>`;
+    }).join("")}
   `;
-
-  els.mapContainer.querySelectorAll(".country-node").forEach((node) => {
-    node.addEventListener("click", () => selectCountry(node.dataset.country));
-    node.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        selectCountry(node.dataset.country);
-      }
+  svg.querySelectorAll(".province-shape").forEach((shape) => {
+    shape.addEventListener("click", () => {
+      state.province = shape.dataset.id;
+      state.district = "all";
+      populateSelects();
+      renderAll();
     });
   });
-
-  els.mapLegend.innerHTML = `
-    <span>Low</span>
-    <span class="legend-scale" aria-hidden="true"></span>
-    <span>High</span>
-    <strong>${escapeHtml(METRICS[state.metric].short)}</strong>
-  `;
+  document.querySelector("#selectedScope").textContent = activeProvince() ? provinceLabel(activeProvince()) : (state.lang === "lo" ? "ທັງປະເທດ" : "National");
+  renderLegend(min, max);
 }
 
-function renderRealAfricaMap(rows, focus) {
-  const width = 620;
-  const height = 540;
-  const rowByName = new Map(store.countries.map((row) => [geoNameForCountry(row.country), row]));
-  const rowByCode = new Map(rows.map((row) => [row.country_code, row]));
-  const projection = d3.geoMercator().fitExtent(
-    [
-      [22, 18],
-      [width - 22, height - 18],
-    ],
-    { type: "FeatureCollection", features: store.africaFeatures }
-  );
-  const path = d3.geoPath(projection);
-
-  const countries = store.africaFeatures
-    .map((feature) => {
-      const naturalName = feature.properties?.name || "";
-      const row = rowByName.get(naturalName);
-      const active = row ? rowByCode.has(row.country_code) : false;
-      const selected = row?.country === focus.country;
-      const value = row?.[state.metric];
-      const tooltip = row
-        ? tooltipHtml(
-            displayCountry(row.country),
-            `${METRICS[state.metric].short}: ${formatPercent(value)}<br>Respondents: ${formatNumber(row.respondents)}`
-          )
-        : tooltipHtml(naturalName, "No Round 10 prototype data loaded");
-      return `
-        <path class="real-country ${selected ? "is-selected" : ""}" d="${path(feature)}"
-          data-country="${row ? escapeAttr(row.country) : ""}"
-          data-tooltip="${escapeAttr(tooltip)}"
-          tabindex="${row ? "0" : "-1"}"
-          role="${row ? "button" : "img"}"
-          fill="${row ? colorFor(value, METRICS[state.metric].polarity) : "#f7f8fb"}"
-          opacity="${row ? (active ? 0.9 : 0.28) : 0.72}"></path>
-      `;
-    })
-    .join("");
-
-  const dots = store.countries
-    .filter((row) => COORDS[row.country_code])
-    .map((row) => {
-      const projected = projection(COORDS[row.country_code]);
-      if (!projected) return "";
-      const [x, y] = projected;
-      const value = row[state.metric];
-      const active = rowByCode.has(row.country_code);
-      const selected = row.country === focus.country;
-      const tooltip = tooltipHtml(
-        displayCountry(row.country),
-        `${METRICS[state.metric].short}: ${formatPercent(value)}<br>Respondents: ${formatNumber(row.respondents)}`
-      );
-      return `
-        <g class="country-node" data-country="${escapeAttr(row.country)}" data-tooltip="${escapeAttr(tooltip)}" tabindex="0" role="button" aria-label="${escapeAttr(displayCountry(row.country))} ${formatPercent(value)}">
-          <circle class="country-dot ${selected ? "is-selected" : ""}" cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${selected ? 10 : 5.8}" fill="${colorFor(value, METRICS[state.metric].polarity)}" opacity="${active ? 1 : 0.2}"></circle>
-          ${selected || value >= 70 || value <= 15 ? `<text class="country-label" x="${(x + 10).toFixed(1)}" y="${(y - 8).toFixed(1)}">${escapeHtml(row.country_code)}</text>` : ""}
-        </g>
-      `;
-    })
-    .join("");
-
-  els.mapContainer.innerHTML = `
-    <svg id="africaMap" viewBox="0 0 ${width} ${height}" role="img" aria-label="Real map of African countries">
-      <rect width="${width}" height="${height}" fill="transparent"></rect>
-      <g>${countries}</g>
-      <g>${dots}</g>
-    </svg>
-  `;
-
-  els.mapContainer.querySelectorAll("[data-country]").forEach((node) => {
-    if (!node.dataset.country) return;
-    node.addEventListener("click", () => selectCountry(node.dataset.country));
-    node.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        selectCountry(node.dataset.country);
-      }
-    });
+function renderLegend(min, max) {
+  const steps = colors.map((c, i) => {
+    const value = min + ((max - min) * i) / (colors.length - 1);
+    return `<span><i style="background:${c}"></i>${fmt(value, state.indicator)}</span>`;
   });
-
-  els.mapLegend.innerHTML = `
-    <span>Low</span>
-    <span class="legend-scale" aria-hidden="true"></span>
-    <span>High</span>
-    <strong>${escapeHtml(METRICS[state.metric].short)}</strong>
-  `;
+  document.querySelector("#mapLegend").innerHTML = steps.join("");
 }
 
-function selectCountry(country) {
-  state.country = country;
-  if (state.compare === country) state.compare = getFallbackCompare(country);
-  syncControls();
-  render();
-}
-
-function renderRanking(rows) {
-  const metric = METRICS[state.metric];
-  els.rankingTitle.textContent = metric.label;
-  els.rankingCount.textContent = `${rows.length} countries`;
-  els.rankingList.innerHTML = rows
-    .map((row) =>
-      barRow({
-        label: displayCountry(row.country),
-        country: row.country,
-        value: row[state.metric],
-        fill: colorFor(row[state.metric], metric.polarity),
-        selected: row.country === state.country,
-      })
-    )
-    .join("");
-
-  els.rankingList.querySelectorAll("[data-country]").forEach((row) => {
-    row.addEventListener("click", () => selectCountry(row.dataset.country));
-  });
-}
-
-function renderDistribution(rows, focus) {
-  const metric = METRICS[state.metric];
-  const values = rows.map((row) => Number(row[state.metric] || 0));
-  const bins = Array.from({ length: 10 }, (_, index) => ({
-    min: index * 10,
-    max: index * 10 + 10,
-    rows: [],
-  }));
-  rows.forEach((row) => {
-    const value = clamp(Number(row[state.metric] || 0), 0, 100);
-    const index = Math.min(9, Math.floor(value / 10));
-    bins[index].rows.push(row);
-  });
-
-  const width = 620;
-  const height = 320;
-  const pad = { left: 46, right: 24, top: 28, bottom: 46 };
-  const innerWidth = width - pad.left - pad.right;
-  const innerHeight = height - pad.top - pad.bottom;
-  const maxCount = Math.max(1, ...bins.map((bin) => bin.rows.length));
-  const barGap = 8;
-  const barWidth = innerWidth / bins.length - barGap;
-  const focusValue = Number(focus[state.metric] || 0);
-  const focusX = pad.left + (focusValue / 100) * innerWidth;
-  const avg = values.reduce((sum, value) => sum + value, 0) / Math.max(1, values.length);
-  const avgX = pad.left + (avg / 100) * innerWidth;
-
-  const bars = bins
-    .map((bin, index) => {
-      const h = (bin.rows.length / maxCount) * innerHeight;
-      const x = pad.left + index * (innerWidth / bins.length) + barGap / 2;
-      const y = pad.top + innerHeight - h;
-      const active = focusValue >= bin.min && (focusValue < bin.max || bin.max === 100);
-      const countries = bin.rows.map((row) => displayCountry(row.country)).slice(0, 6).join(", ");
-      const tooltip = tooltipHtml(
-        `${bin.min}-${bin.max}%`,
-        `${bin.rows.length} countr${bin.rows.length === 1 ? "y" : "ies"}<br>${countries || "No country in this range"}`
-      );
-      return `
-        <rect class="distribution-bin" data-tooltip="${escapeAttr(tooltip)}" x="${x}" y="${y}" width="${barWidth}" height="${h}" rx="3" fill="${active ? "#f25528" : "#d8d8de"}"></rect>
-        <text class="chart-label" x="${x + barWidth / 2}" y="${height - 18}" text-anchor="middle">${bin.min}</text>
-      `;
-    })
-    .join("");
-
-  els.distributionChart.innerHTML = `
-    <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Distribution of selected indicator">
-      <line class="chart-axis" x1="${pad.left}" y1="${pad.top + innerHeight}" x2="${width - pad.right}" y2="${pad.top + innerHeight}"></line>
-      ${bars}
-      <line x1="${avgX}" y1="${pad.top}" x2="${avgX}" y2="${pad.top + innerHeight}" stroke="#111" stroke-dasharray="4 5"></line>
-      <line x1="${focusX}" y1="${pad.top}" x2="${focusX}" y2="${pad.top + innerHeight}" stroke="#f25528" stroke-width="3"></line>
-      <text class="chart-label" x="${avgX + 6}" y="${pad.top + 14}">Average ${formatPercent(avg)}</text>
-      <text class="chart-label" x="${focusX + 6}" y="${pad.top + 34}">${escapeHtml(displayCountry(focus.country))} ${formatPercent(focusValue)}</text>
-      <text class="chart-label" x="${width - pad.right}" y="${height - 18}" text-anchor="end">100</text>
-      <text class="chart-label" x="${pad.left}" y="${height - 4}">${escapeHtml(metric.short)} (%)</text>
-    </svg>
-  `;
-}
-
-function renderScatter(focus) {
-  const width = 620;
-  const height = 320;
-  const pad = { left: 54, right: 24, top: 24, bottom: 52 };
-  const innerWidth = width - pad.left - pad.right;
-  const innerHeight = height - pad.top - pad.bottom;
-  const xKey = "economy_good_pct";
-  const yKey = "living_conditions_good_pct";
-
-  const grid = [0, 25, 50, 75, 100]
-    .map((tick) => {
-      const x = pad.left + (tick / 100) * innerWidth;
-      const y = pad.top + innerHeight - (tick / 100) * innerHeight;
-      return `
-        <line class="chart-grid" x1="${x}" y1="${pad.top}" x2="${x}" y2="${pad.top + innerHeight}"></line>
-        <line class="chart-grid" x1="${pad.left}" y1="${y}" x2="${width - pad.right}" y2="${y}"></line>
-        <text class="chart-label" x="${x}" y="${height - 24}" text-anchor="middle">${tick}</text>
-        <text class="chart-label" x="${pad.left - 10}" y="${y + 4}" text-anchor="end">${tick}</text>
-      `;
-    })
-    .join("");
-
-  const dots = store.countries
-    .map((row) => {
-      const x = pad.left + (Number(row[xKey] || 0) / 100) * innerWidth;
-      const y = pad.top + innerHeight - (Number(row[yKey] || 0) / 100) * innerHeight;
-      const selected = row.country === focus.country;
-      const tooltip = tooltipHtml(
-        displayCountry(row.country),
-        `Economy good: ${formatPercent(row[xKey])}<br>Living good: ${formatPercent(row[yKey])}<br>${METRICS[state.metric].short}: ${formatPercent(row[state.metric])}`
-      );
-      return `
-        <g tabindex="0" role="button" data-country="${escapeAttr(row.country)}" data-tooltip="${escapeAttr(tooltip)}" aria-label="${escapeAttr(displayCountry(row.country))}">
-          <title>${escapeHtml(displayCountry(row.country))}: economy ${formatPercent(row[xKey])}, living ${formatPercent(row[yKey])}</title>
-          <circle class="chart-dot ${selected ? "is-selected" : ""}" cx="${x}" cy="${y}" r="${selected ? 9 : 6}" fill="${selected ? "#f25528" : "#111"}" opacity="${selected ? 1 : 0.56}"></circle>
-          ${selected ? `<text class="chart-label" x="${x + 12}" y="${y - 10}">${escapeHtml(displayCountry(row.country))}</text>` : ""}
-        </g>
-      `;
-    })
-    .join("");
-
-  els.scatterChart.innerHTML = `
-    <svg viewBox="0 0 ${width} ${height}" role="img" aria-label="Scatter chart economy versus living conditions">
-      ${grid}
-      <line class="chart-axis" x1="${pad.left}" y1="${pad.top + innerHeight}" x2="${width - pad.right}" y2="${pad.top + innerHeight}"></line>
-      <line class="chart-axis" x1="${pad.left}" y1="${pad.top}" x2="${pad.left}" y2="${pad.top + innerHeight}"></line>
-      ${dots}
-      <text class="chart-label" x="${pad.left + innerWidth / 2}" y="${height - 4}" text-anchor="middle">Economy described as good (%)</text>
-      <text class="chart-label" x="14" y="${pad.top + innerHeight / 2}" transform="rotate(-90 14 ${pad.top + innerHeight / 2})" text-anchor="middle">Living conditions good (%)</text>
-    </svg>
-  `;
-
-  els.scatterChart.querySelectorAll("[data-country]").forEach((node) => {
-    node.addEventListener("click", () => selectCountry(node.dataset.country));
-    node.addEventListener("keydown", (event) => {
-      if (event.key === "Enter" || event.key === " ") {
-        event.preventDefault();
-        selectCountry(node.dataset.country);
-      }
-    });
-  });
-}
-
-function renderProfile(focus) {
-  els.profileTitle.textContent = displayCountry(focus.country);
-  els.profileMeta.textContent = `${formatNumber(focus.respondents)} respondents · ${focus.regions} regions`;
-  const rows = Object.entries(METRICS).map(([key, metric]) => ({
-    label: metric.short,
-    value: focus[key],
-    fill: "#ffffff",
-  }));
-  els.profileBars.innerHTML = rows.map((row) => barRow(row)).join("");
-}
-
-function renderComparison(focus, compare) {
-  els.compareTitle.textContent = `${displayCountry(focus.country)} vs ${displayCountry(compare.country)}`;
-  els.compareBars.innerHTML = Object.entries(METRICS)
-    .map(([key, metric]) => {
-      const focusValue = Number(focus[key] || 0);
-      const compareValue = Number(compare[key] || 0);
-      return `
-        <div class="compare-item">
-          <div class="bar-row" data-tooltip="${escapeAttr(tooltipHtml(displayCountry(focus.country), `${metric.short}: ${formatPercent(focusValue)}`))}">
-            <span class="bar-label">${escapeHtml(metric.short)}</span>
-            <div class="bar-track"><div class="bar-fill" style="width:${focusValue}%; background:${colorFor(focusValue, metric.polarity)}"></div></div>
-            <span class="bar-value">${formatPercent(focusValue)}</span>
-          </div>
-          <div class="bar-row" data-tooltip="${escapeAttr(tooltipHtml(displayCountry(compare.country), `${metric.short}: ${formatPercent(compareValue)}`))}">
-            <span class="bar-label muted-label">${escapeHtml(displayCountry(compare.country))}</span>
-            <div class="bar-track"><div class="bar-fill" style="width:${compareValue}%; background:#111"></div></div>
-            <span class="bar-value">${formatPercent(compareValue)}</span>
-          </div>
-        </div>
-      `;
-    })
-    .join("");
-}
-
-function renderSegments(focus) {
-  const metric = METRICS[state.metric];
-  els.segmentTitle.textContent = `${state.segment} in ${displayCountry(focus.country)}`;
-  const segments = store.segments
-    .filter((row) => row.country === focus.country && row.segment_type === state.segment)
-    .sort((a, b) => segmentSort(a.segment, b.segment));
-
-  els.segmentBars.innerHTML =
-    segments.length > 0
-      ? segments
-          .map((row) =>
-            barRow({
-              label: `${row.segment} (${formatNumber(row.respondents)})`,
-              value: row[state.metric],
-              fill: colorFor(row[state.metric], metric.polarity),
-            })
-          )
-          .join("")
-      : `<p>No segment records available for this country.</p>`;
-}
-
-function renderRegions(focus) {
-  const metric = METRICS[state.metric];
-  els.regionTitle.textContent = `${displayCountry(focus.country)} regions`;
-  els.regionMetricHead.textContent = metric.short;
-  const regions = store.regions
-    .filter((row) => row.country === focus.country)
-    .sort((a, b) => Number(b[state.metric] || -1) - Number(a[state.metric] || -1))
-    .slice(0, 18);
-
-  els.regionRows.innerHTML = regions
-    .map(
-      (row) => `
-        <tr>
-          <td>${escapeHtml(row.region)}</td>
-          <td><strong>${formatPercent(row[state.metric])}</strong></td>
-          <td>${formatNumber(row.respondents)}</td>
-        </tr>
-      `
-    )
-    .join("");
-}
-
-function renderInsights(rows, focus, compare) {
-  const metric = METRICS[state.metric];
-  const high = maxBy(rows, state.metric);
-  const low = minBy(rows, state.metric);
-  const delta = Math.abs(Number(focus[state.metric] || 0) - Number(compare[state.metric] || 0)).toFixed(1);
-  const focusDirection = focus[state.metric] >= weightedAverage(rows, state.metric) ? "above" : "below";
-
-  const bullets = [
-    `${displayCountry(focus.country)} is ${focusDirection} the filtered country average for ${metric.label.toLowerCase()} (${formatPercent(focus[state.metric])}).`,
-    `${displayCountry(high.country)} currently has the highest value in this view (${formatPercent(high[state.metric])}), while ${displayCountry(low.country)} has the lowest (${formatPercent(low[state.metric])}).`,
-    `${displayCountry(focus.country)} and ${displayCountry(compare.country)} differ by ${delta} percentage points on the selected indicator.`,
-    "The interface supports the RFQ requirements: country comparison, demographic disaggregation, regional detail, search, and export-friendly outputs.",
+function renderInsights() {
+  const top = [...PROVINCES].sort((a, b) => val(b, state.indicator) - val(a, state.indicator))[0];
+  const low = [...PROVINCES].sort((a, b) => val(a, state.indicator) - val(b, state.indicator))[0];
+  const fast = [...PROVINCES].sort((a, b) => growth(b) - growth(a))[0];
+  const selected = activeProvince();
+  const rows = [
+    [state.lang === "lo" ? "ຄ່າສູງສຸດ" : "Highest current value", `${provinceLabel(top)}: ${fmt(val(top, state.indicator), state.indicator)}`, state.lang === "lo" ? "ເໝາະສຳລັບການຈັດລຳດັບແຂວງ." : "Use this for rapid province ranking and resource targeting."],
+    [state.lang === "lo" ? "ຄ່າຕ່ຳສຸດ" : "Lowest current value", `${provinceLabel(low)}: ${fmt(val(low, state.indicator), state.indicator)}`, state.lang === "lo" ? "ຊ່ວຍຄົ້ນຫາພື້ນທີ່ຕ້ອງການສະໜັບສະໜູນ." : "Highlights areas where follow-up analysis may be needed."],
+    [state.lang === "lo" ? "ເຕີບໂຕໄວ" : "Fastest population growth", `${provinceLabel(fast)}: ${fmt(growth(fast), "growth")}`, state.lang === "lo" ? "ສຳຄັນຕໍ່ການວາງແຜນໂຄງສ້າງພື້ນຖານ." : "Important for infrastructure, schooling, and service planning."],
+    [state.lang === "lo" ? "ຂອບເຂດປັດຈຸບັນ" : "Current scope", selected ? provinceLabel(selected) : "Lao PDR", state.lang === "lo" ? "ຕົວກອງທັງໝົດນຳໄປໃຊ້ໃນຕາຕະລາງແລະແຜນພາບ." : "All filters are reflected in the charts and downloadable tables."],
   ];
-
-  els.insights.innerHTML = bullets.map((text) => `<div class="insight">${escapeHtml(text)}</div>`).join("");
+  document.querySelector("#insightList").innerHTML = rows.map(([k, v, d]) => `<div class="insight"><span class="chip">${k}</span><strong>${v}</strong><p>${d}</p></div>`).join("");
 }
 
-function barRow({ label, country = label, value, fill = "var(--ab-orange)", selected = false }) {
-  const safeValue = clamp(Number(value || 0), 0, 100);
-  const tooltip = tooltipHtml(label, `${METRICS[state.metric]?.short || "Value"}: ${formatPercent(safeValue)}`);
-  return `
-    <div class="bar-row ${selected ? "is-selected-row" : ""}" data-country="${escapeAttr(country)}" data-tooltip="${escapeAttr(tooltip)}" tabindex="0">
-      <span class="bar-label">${escapeHtml(label)}</span>
-      <div class="bar-track"><div class="bar-fill" style="width:${safeValue}%; background:${fill}"></div></div>
-      <span class="bar-value">${formatPercent(safeValue)}</span>
+function ageProfile() {
+  const p = activeProvince();
+  const youthBias = p ? (p.youth - 52) / 100 : 0;
+  const bands = ["80+", "75-79", "70-74", "65-69", "60-64", "55-59", "50-54", "45-49", "40-44", "35-39", "30-34", "25-29", "20-24", "15-19", "10-14", "5-9", "0-4"];
+  const base = [1.1, 1.4, 1.8, 2.2, 2.9, 3.5, 4.0, 4.5, 5.0, 5.6, 6.2, 6.9, 7.4, 8.0, 8.4, 8.1, 7.6];
+  return bands.map((band, i) => {
+    const youngBoost = (i > 10 ? youthBias * 32 : -youthBias * 14);
+    const male = Math.max(0.7, base[i] + youngBoost + (i % 3 - 1) * 0.18);
+    const female = Math.max(0.7, base[i] + youngBoost + 0.25 + (i % 2) * 0.12);
+    return { band, male, female };
+  });
+}
+
+function renderPyramid() {
+  const data = ageProfile();
+  const max = Math.max(...data.flatMap((d) => [d.male, d.female]));
+  document.querySelector("#pyramidChart").innerHTML = data.map((d) => `
+    <div class="bar-row">
+      <span>${d.band}</span>
+      <div class="bar-track"><div class="bar-fill male" style="width:${(d.male / max) * 100}%"></div></div>
+      <div class="bar-track"><div class="bar-fill female" style="width:${(d.female / max) * 100}%"></div></div>
+      <span>${d.female.toFixed(1)}%</span>
     </div>
+  `).join("");
+}
+
+function renderTrend() {
+  const selected = activeProvince();
+  const data = selected ? [selected] : [...PROVINCES].sort((a, b) => b.pop2025 - a.pop2025).slice(0, 8);
+  const max = Math.max(...data.flatMap((p) => [p.pop2015, p.pop2025]));
+  const rows = data.map((p, i) => {
+    const y = 42 + i * 34;
+    const x1 = 170;
+    const x2 = 170 + (p.pop2015 / max) * 220;
+    const x3 = 170 + (p.pop2025 / max) * 220;
+    return `
+      <text x="6" y="${y + 5}" font-size="12" font-weight="700" fill="#16212d">${provinceLabel(p)}</text>
+      <line x1="${x1}" y1="${y}" x2="${x2}" y2="${y}" stroke="#8fb7c4" stroke-width="10" stroke-linecap="round"></line>
+      <line x1="${x1}" y1="${y + 12}" x2="${x3}" y2="${y + 12}" stroke="#d4212f" stroke-width="10" stroke-linecap="round"></line>
+      <text x="${x3 + 8}" y="${y + 16}" font-size="11" font-weight="800" fill="#667382">${fmt(p.pop2025, "pop2025")}</text>
+    `;
+  }).join("");
+  document.querySelector("#trendChart").innerHTML = `
+    <svg class="trend-svg" viewBox="0 0 460 320" role="img" aria-label="Population trend chart">
+      <text x="170" y="20" font-size="11" font-weight="900" fill="#667382">2015</text>
+      <text x="224" y="20" font-size="11" font-weight="900" fill="#d4212f">2025</text>
+      ${rows}
+    </svg>
   `;
 }
 
-function weightedAverage(rows, key) {
-  const denom = rows.reduce((sum, row) => sum + Number(row.weighted_base || row.respondents || 0), 0);
-  if (!denom) return 0;
-  const total = rows.reduce((sum, row) => sum + Number(row[key] || 0) * Number(row.weighted_base || row.respondents || 0), 0);
-  return total / denom;
+function adjustedMeasure(row, col, measure) {
+  const base = national(measure);
+  const rowText = String(row);
+  const colText = String(col);
+  let factor = 1;
+  if (rowText.includes("Vientiane") || colText === "Urban") factor += 0.09;
+  if (rowText.includes("Phongsaly") || rowText.includes("Xekong") || colText === "Rural") factor -= 0.06;
+  if (colText === "Female" && ["literacy", "school"].includes(measure)) factor += 0.015;
+  if (colText === "Hmong-Mien" || rowText === "Hmong-Mien") factor -= 0.08;
+  if (colText === "60+" || rowText === "60+") factor -= 0.04;
+  if (measure === "pop2025") {
+    const p = PROVINCES.find((x) => x.name === row) || PROVINCES.find((x) => x.name === col);
+    return p ? p.pop2025 / (colDimCount() || 1) : base / 12;
+  }
+  return Math.max(0, base * factor);
 }
 
-function maxBy(rows, key) {
-  return rows.reduce((best, row) => (!best || Number(row[key] || -1) > Number(best[key] || -1) ? row : best), null);
+function dimValues(dim) {
+  if (dim === "province") return PROVINCES.map((p) => p.name);
+  return dims[dim] || [];
 }
 
-function minBy(rows, key) {
-  return rows.reduce((best, row) => (!best || Number(row[key] ?? 101) < Number(best[key] ?? 101) ? row : best), null);
+function colDimCount() {
+  return dimValues(state.colDim).length;
 }
 
-function colorFor(value, polarity) {
-  const v = clamp(Number(value || 0), 0, 100);
-  const positive = polarity === "positive";
-  const normalized = positive ? v : 100 - v;
-  if (normalized >= 65) return "#087f5b";
-  if (normalized >= 40) return "#f7a813";
-  return "#b42318";
+function renderCrosstab() {
+  const rows = dimValues(state.rowDim);
+  const cols = dimValues(state.colDim);
+  const head = `<thead><tr><th>${state.rowDim}</th>${cols.map((c) => `<th>${c}</th>`).join("")}</tr></thead>`;
+  const body = rows.map((r) => `<tr><td>${r}</td>${cols.map((c) => `<td>${fmt(adjustedMeasure(r, c, state.measure), state.measure)}</td>`).join("")}</tr>`).join("");
+  document.querySelector("#crosstabTable").innerHTML = `${head}<tbody>${body}</tbody>`;
 }
 
-function segmentSort(a, b) {
-  const order = ["Women", "Men", "Urban", "Peri-urban", "Rural", "18-25", "26-35", "36-50", "51+"];
-  return (order.indexOf(a) === -1 ? 99 : order.indexOf(a)) - (order.indexOf(b) === -1 ? 99 : order.indexOf(b));
+function renderTimeline() {
+  const items = [
+    ["3 days", "Inception blueprint", "UI/UX wireframes, data schema, localization map, LAOSIS assessment."],
+    ["6 days", "Data warehouse", "Aggregated ingestion scripts, anonymization checks, PostgreSQL/PostGIS design."],
+    ["10 days", "Beta dashboard", "Private staging instance with GIS, filters, pyramids, exports, and tests."],
+    ["5 days", "Manuals and code", "Admin guide, user guide, data dictionary, clean documented repository."],
+    ["8 days", "Live deployment", "Official hosting migration, stress/security audit, and LSB hands-on training."],
+  ];
+  document.querySelector("#timeline").innerHTML = items.map(([days, title, body]) => `<div class="timeline-item"><span>${days}</span><strong>${title}</strong><p>${body}</p></div>`).join("");
 }
 
-function downloadCurrentCsv() {
-  const rows = getFilteredCountries();
-  const headers = ["country_code", "country", "respondents", "regions", ...Object.keys(METRICS)];
-  const csv = [headers.join(",")]
-    .concat(
-      rows.map((row) =>
-        headers
-          .map((header) => {
-            const value = row[header] ?? "";
-            return `"${String(value).replace(/"/g, '""')}"`;
-          })
-          .join(",")
-      )
-    )
-    .join("\n");
-  downloadBlob(csv, "afrobarometer-round10-dashboard-view.csv", "text/csv;charset=utf-8");
-  showToast("CSV exported");
+function applyTranslations() {
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    const key = el.dataset.i18n;
+    el.textContent = TRANSLATIONS[state.lang][key] || TRANSLATIONS.en[key] || el.textContent;
+  });
+  document.documentElement.lang = state.lang === "lo" ? "lo" : "en";
+  document.querySelector("#langEn").classList.toggle("active", state.lang === "en");
+  document.querySelector("#langLo").classList.toggle("active", state.lang === "lo");
 }
 
-function downloadMapSvg() {
-  const svg = document.getElementById("africaMap");
-  if (!svg) return;
-  const source = `<?xml version="1.0" encoding="UTF-8"?>\n${svg.outerHTML}`;
-  downloadBlob(source, "afrobarometer-dashboard-map.svg", "image/svg+xml;charset=utf-8");
-  showToast("Map SVG exported");
+function renderAll() {
+  applyTranslations();
+  populateSelects();
+  renderKpis();
+  renderMap();
+  renderInsights();
+  renderPyramid();
+  renderTrend();
+  renderCrosstab();
+  renderTimeline();
 }
 
-function downloadBlob(content, fileName, mimeType) {
-  const blob = new Blob([content], { type: mimeType });
+function exportRows() {
+  return filteredProvinces().map((p) => ({
+    province: p.name,
+    province_lao: p.lao,
+    district_filter: state.district,
+    sex_filter: state.sex,
+    area_filter: state.area,
+    ethno_filter: state.ethno,
+    population_2015: p.pop2015,
+    population_2025: p.pop2025,
+    growth_2015_2025_pct: growth(p).toFixed(2),
+    urban_share_pct: p.urban,
+    youth_under_30_pct: p.youth,
+    working_age_pct: p.working,
+    literacy_pct: p.literacy,
+    school_attendance_pct: p.school,
+    improved_water_pct: p.water,
+    electricity_pct: p.electricity,
+    internet_pct: p.internet,
+    total_fertility_rate: p.tfr,
+    source: "Synthetic aggregated demo for UNFPA/LSB dashboard prototype",
+  }));
+}
+
+function download(filename, text, type) {
+  const blob = new Blob([text], { type });
   const url = URL.createObjectURL(blob);
-  const anchor = document.createElement("a");
-  anchor.href = url;
-  anchor.download = fileName;
-  document.body.appendChild(anchor);
-  anchor.click();
-  anchor.remove();
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  a.click();
   URL.revokeObjectURL(url);
 }
 
-function renderError(error) {
-  els.statusCountryCount.textContent = "Data failed to load";
-  els.kpiRow.innerHTML = `
-    <div class="kpi">
-      <span>Error</span>
-      <strong>Data</strong>
-      <small>${escapeHtml(error.message)}</small>
-    </div>
-  `;
-  console.error(error);
+function toCsv(rows) {
+  const headers = Object.keys(rows[0] || {});
+  const escape = (v) => `"${String(v).replaceAll('"', '""')}"`;
+  return [headers.join(","), ...rows.map((r) => headers.map((h) => escape(r[h])).join(","))].join("\n");
 }
 
-function bindTooltipEvents() {
-  document.addEventListener("mouseover", (event) => {
-    const target = event.target.closest("[data-tooltip]");
-    if (!target) return;
-    showDataTooltip(target.dataset.tooltip, event.clientX, event.clientY);
-  });
-
-  document.addEventListener("mousemove", (event) => {
-    if (!els.dataTooltip.classList.contains("is-visible")) return;
-    moveDataTooltip(event.clientX, event.clientY);
-  });
-
-  document.addEventListener("mouseout", (event) => {
-    if (!event.target.closest("[data-tooltip]")) return;
-    hideDataTooltip();
-  });
-
-  document.addEventListener("focusin", (event) => {
-    const target = event.target.closest("[data-tooltip]");
-    if (!target) return;
-    const rect = target.getBoundingClientRect();
-    showDataTooltip(target.dataset.tooltip, rect.left + rect.width / 2, rect.top + rect.height / 2);
-  });
-
-  document.addEventListener("focusout", (event) => {
-    if (!event.target.closest("[data-tooltip]")) return;
-    hideDataTooltip();
-  });
-}
-
-function showDataTooltip(content, x, y) {
-  if (!content) return;
-  els.dataTooltip.innerHTML = content;
-  els.dataTooltip.setAttribute("aria-hidden", "false");
-  els.dataTooltip.classList.add("is-visible");
-  moveDataTooltip(x, y);
-}
-
-function moveDataTooltip(x, y) {
-  const margin = 16;
-  const rect = els.dataTooltip.getBoundingClientRect();
-  const left = Math.min(window.innerWidth - rect.width - margin, Math.max(margin, x + 14));
-  const top = Math.min(window.innerHeight - rect.height - margin, Math.max(margin, y + 14));
-  els.dataTooltip.style.transform = `translate(${left}px, ${top}px) scale(1)`;
-}
-
-function hideDataTooltip() {
-  els.dataTooltip.classList.remove("is-visible");
-  els.dataTooltip.setAttribute("aria-hidden", "true");
-}
-
-function tooltipHtml(title, body) {
-  const safeBody = String(body)
-    .split("<br>")
-    .map((part) => escapeHtml(part))
-    .join("<br>");
-  return `<strong>${escapeHtml(title)}</strong>${safeBody}`;
-}
-
-function flatPath(points) {
-  return points
-    .map(([lon, lat], index) => {
-      const [x, y] = flatProject(lon, lat);
-      return `${index === 0 ? "M" : "L"}${x.toFixed(1)} ${y.toFixed(1)}`;
-    })
-    .join(" ") + " Z";
-}
-
-function flatProject(lon, lat) {
-  return [(lon + 26) * 7.85, (36 - lat) * 7.25];
-}
-
-function isAfricaFeature(feature) {
-  const name = feature?.properties?.name || "";
-  if (AFRICA_FEATURE_NAMES.has(name)) return true;
-  if (!window.d3) return false;
-  const [lon, lat] = d3.geoCentroid(feature);
-  return lon >= -26 && lon <= 58 && lat >= -36 && lat <= 38 && !["Saudi Arabia", "Yemen", "Oman", "Iran", "Iraq"].includes(name);
-}
-
-function geoNameForCountry(country) {
-  return DATA_TO_GEO_NAME[country] || country;
-}
-
-function showToast(message) {
-  els.toast.textContent = message;
-  els.toast.classList.add("is-visible");
-  window.clearTimeout(showToast.timeout);
-  showToast.timeout = window.setTimeout(() => els.toast.classList.remove("is-visible"), 2200);
-}
-
-function updateGlobeTarget(focus) {
-  const coord = COORDS[focus.country_code] || [24, 0];
-  globe.targetLon = coord[0];
-  globe.targetLat = coord[1];
-  els.globeCountry.textContent = displayCountry(focus.country);
-  els.globeMeta.textContent = `${formatPercent(focus[state.metric])} on ${METRICS[state.metric].short.toLowerCase()} · ${formatNumber(focus.respondents)} respondents`;
-  if (globe.canvas) {
-    globe.canvas.dataset.tooltip = tooltipHtml(
-      `Globe focus: ${displayCountry(focus.country)}`,
-      `${METRICS[state.metric].short}: ${formatPercent(focus[state.metric])}<br>Respondents: ${formatNumber(focus.respondents)}`
-    );
-  }
-  if (!globe.ctx && globe.canvas) globe.ctx = globe.canvas.getContext("2d");
-  if (!globe.raf) animateGlobe();
-}
-
-function animateGlobe() {
-  globe.orbit += 0.018;
-  const orbitalLon = globe.targetLon + Math.sin(globe.orbit) * 14;
-  const orbitalLat = globe.targetLat + Math.cos(globe.orbit * 0.8) * 3;
-  globe.currentLon += shortestAngle(globe.currentLon, orbitalLon) * 0.075;
-  globe.currentLat += (orbitalLat - globe.currentLat) * 0.075;
-  drawGlobe();
-  globe.raf = window.requestAnimationFrame(animateGlobe);
-}
-
-function drawGlobe() {
-  if (!globe.ctx) return;
-  if (window.d3 && store.geoFeatures.length) {
-    drawRealGlobe();
-    return;
-  }
-  const canvas = globe.canvas;
-  const ctx = globe.ctx;
-  const width = canvas.width;
-  const height = canvas.height;
-  const cx = width / 2;
-  const cy = height / 2;
-  const radius = Math.min(width, height) * 0.39;
-
-  ctx.clearRect(0, 0, width, height);
-  const ocean = ctx.createRadialGradient(cx - radius * 0.32, cy - radius * 0.38, radius * 0.1, cx, cy, radius);
-  ocean.addColorStop(0, "#f8fbff");
-  ocean.addColorStop(0.2, "#dbe8f4");
-  ocean.addColorStop(0.5, "#6f96ad");
-  ocean.addColorStop(1, "#173447");
-  ctx.fillStyle = ocean;
-  ctx.beginPath();
-  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-  ctx.fill();
-
-  ctx.save();
-  ctx.beginPath();
-  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-  ctx.clip();
-
-  drawGraticule(ctx, cx, cy, radius);
-  drawLandMasses(ctx, cx, cy, radius);
-  drawCountryPins(ctx, cx, cy, radius);
-
-  const shade = ctx.createRadialGradient(cx - radius * 0.4, cy - radius * 0.45, radius * 0.1, cx + radius * 0.24, cy + radius * 0.18, radius * 1.1);
-  shade.addColorStop(0, "rgba(255,255,255,0.42)");
-  shade.addColorStop(0.45, "rgba(255,255,255,0.02)");
-  shade.addColorStop(1, "rgba(0,0,0,0.38)");
-  ctx.fillStyle = shade;
-  ctx.fillRect(cx - radius, cy - radius, radius * 2, radius * 2);
-  ctx.restore();
-
-  ctx.strokeStyle = "rgba(255,255,255,0.58)";
-  ctx.lineWidth = 2;
-  ctx.beginPath();
-  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-  ctx.stroke();
-}
-
-function drawRealGlobe() {
-  const canvas = globe.canvas;
-  const ctx = globe.ctx;
-  const width = canvas.width;
-  const height = canvas.height;
-  const cx = width / 2;
-  const cy = height / 2;
-  const radius = Math.min(width, height) * 0.41;
-  const projection = d3.geoOrthographic()
-    .translate([cx, cy])
-    .scale(radius)
-    .rotate([-globe.currentLon, -globe.currentLat])
-    .clipAngle(90);
-  const path = d3.geoPath(projection, ctx);
-  const graticule = d3.geoGraticule10();
-  const focus = getCountry(state.country);
-  const focusName = focus ? geoNameForCountry(focus.country) : "";
-
-  ctx.clearRect(0, 0, width, height);
-
-  const ocean = ctx.createRadialGradient(cx - radius * 0.34, cy - radius * 0.38, radius * 0.08, cx, cy, radius * 1.06);
-  ocean.addColorStop(0, "#eef8ff");
-  ocean.addColorStop(0.23, "#9fbdd0");
-  ocean.addColorStop(0.62, "#31576e");
-  ocean.addColorStop(1, "#0b2030");
-  ctx.fillStyle = ocean;
-  ctx.beginPath();
-  path({ type: "Sphere" });
-  ctx.fill();
-
-  ctx.strokeStyle = "rgba(255,255,255,0.18)";
-  ctx.lineWidth = 0.9;
-  ctx.beginPath();
-  path(graticule);
-  ctx.stroke();
-
-  store.geoFeatures.forEach((feature) => {
-    const name = feature.properties?.name || "";
-    const isAfrica = isAfricaFeature(feature);
-    const matchedRow = store.countries.find((row) => geoNameForCountry(row.country) === name);
-    const selected = name === focusName;
-    ctx.beginPath();
-    path(feature);
-    ctx.fillStyle = selected
-      ? "rgba(242, 85, 40, 0.96)"
-      : isAfrica
-        ? "rgba(248, 247, 242, 0.96)"
-        : "rgba(248, 247, 242, 0.46)";
-    ctx.fill();
-    ctx.strokeStyle = selected ? "rgba(255,255,255,0.95)" : isAfrica ? "rgba(17,17,17,0.24)" : "rgba(255,255,255,0.2)";
-    ctx.lineWidth = selected ? 2.2 : matchedRow ? 0.9 : 0.55;
-    ctx.stroke();
-  });
-
-  drawRealGlobePins(ctx, projection, focus);
-
-  const shade = ctx.createRadialGradient(cx - radius * 0.4, cy - radius * 0.45, radius * 0.08, cx + radius * 0.22, cy + radius * 0.18, radius * 1.08);
-  shade.addColorStop(0, "rgba(255,255,255,0.45)");
-  shade.addColorStop(0.46, "rgba(255,255,255,0)");
-  shade.addColorStop(1, "rgba(0,0,0,0.42)");
-  ctx.fillStyle = shade;
-  ctx.beginPath();
-  path({ type: "Sphere" });
-  ctx.fill();
-
-  ctx.strokeStyle = "rgba(255,255,255,0.58)";
-  ctx.lineWidth = 2.4;
-  ctx.beginPath();
-  path({ type: "Sphere" });
-  ctx.stroke();
-}
-
-function drawRealGlobePins(ctx, projection, focus) {
-  store.countries.forEach((country) => {
-    const coord = COORDS[country.country_code];
-    if (!coord) return;
-    const projected = projection(coord);
-    if (!projected) return;
-    const [x, y] = projected;
-    const selected = focus && country.country === focus.country;
-    ctx.fillStyle = selected ? "#ffffff" : "rgba(17,17,17,0.42)";
-    ctx.strokeStyle = selected ? "#f25528" : "rgba(255,255,255,0.86)";
-    ctx.lineWidth = selected ? 4 : 1.5;
-    ctx.beginPath();
-    ctx.arc(x, y, selected ? 8 : 3.2, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-    if (selected) {
-      ctx.strokeStyle = "rgba(242,85,40,0.28)";
-      ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.arc(x, y, 22, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-  });
-}
-
-function drawGraticule(ctx, cx, cy, radius) {
-  ctx.strokeStyle = "rgba(255,255,255,0.18)";
-  ctx.lineWidth = 1;
-  for (let lat = -60; lat <= 60; lat += 30) {
-    drawProjectedLine(ctx, cx, cy, radius, range(-180, 180, 4).map((lon) => [lon, lat]));
-  }
-  for (let lon = -180; lon <= 180; lon += 30) {
-    drawProjectedLine(ctx, cx, cy, radius, range(-80, 80, 4).map((lat) => [lon, lat]));
-  }
-}
-
-function drawLandMasses(ctx, cx, cy, radius) {
-  ctx.fillStyle = "rgba(247, 245, 240, 0.9)";
-  ctx.strokeStyle = "rgba(17,17,17,0.22)";
-  ctx.lineWidth = 1.2;
-  [SOUTH_AMERICA_HINT, EURASIA_HINT, AFRICA_MAIN, MADAGASCAR].forEach((poly) => drawProjectedPolygon(ctx, cx, cy, radius, poly));
-
-  ctx.strokeStyle = "rgba(242,85,40,0.22)";
-  ctx.lineWidth = 2.4;
-  drawProjectedLine(ctx, cx, cy, radius, AFRICA_MAIN);
-}
-
-function drawCountryPins(ctx, cx, cy, radius) {
-  store.countries.forEach((country) => {
-    const coord = COORDS[country.country_code];
-    if (!coord) return;
-    const projected = project(coord[0], coord[1], cx, cy, radius);
-    if (!projected.visible) return;
-    const selected = country.country === state.country;
-    ctx.fillStyle = selected ? "#f25528" : "rgba(17,17,17,0.38)";
-    ctx.strokeStyle = "#fff";
-    ctx.lineWidth = selected ? 3 : 1.5;
-    ctx.beginPath();
-    ctx.arc(projected.x, projected.y, selected ? 7 : 3.2, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.stroke();
-    if (selected) {
-      ctx.strokeStyle = "rgba(242,85,40,0.35)";
-      ctx.lineWidth = 2;
-      ctx.beginPath();
-      ctx.arc(projected.x, projected.y, 18, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-  });
-}
-
-function drawProjectedLine(ctx, cx, cy, radius, points) {
-  let started = false;
-  ctx.beginPath();
-  points.forEach(([lon, lat]) => {
-    const p = project(lon, lat, cx, cy, radius);
-    if (!p.visible) {
-      started = false;
-      return;
-    }
-    if (!started) {
-      ctx.moveTo(p.x, p.y);
-      started = true;
-    } else {
-      ctx.lineTo(p.x, p.y);
-    }
-  });
-  ctx.stroke();
-}
-
-function drawProjectedPolygon(ctx, cx, cy, radius, points) {
-  const projected = points.map(([lon, lat]) => project(lon, lat, cx, cy, radius)).filter((p) => p.visible);
-  if (projected.length < 3) return;
-  ctx.beginPath();
-  projected.forEach((point, index) => {
-    if (index === 0) ctx.moveTo(point.x, point.y);
-    else ctx.lineTo(point.x, point.y);
-  });
-  ctx.closePath();
-  ctx.fill();
-  ctx.stroke();
-}
-
-function project(lon, lat, cx, cy, radius) {
-  const lambda = toRad(lon - globe.currentLon);
-  const phi = toRad(lat);
-  const phi0 = toRad(globe.currentLat);
-  const cosc = Math.sin(phi0) * Math.sin(phi) + Math.cos(phi0) * Math.cos(phi) * Math.cos(lambda);
-  return {
-    x: cx + radius * Math.cos(phi) * Math.sin(lambda),
-    y: cy - radius * (Math.cos(phi0) * Math.sin(phi) - Math.sin(phi0) * Math.cos(phi) * Math.cos(lambda)),
-    visible: cosc > -0.08,
+function downloadMapPng() {
+  const svg = document.querySelector("#laoMap");
+  const xml = new XMLSerializer().serializeToString(svg);
+  const img = new Image();
+  const url = URL.createObjectURL(new Blob([xml], { type: "image/svg+xml;charset=utf-8" }));
+  img.onload = () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 920;
+    canvas.height = 1320;
+    const ctx = canvas.getContext("2d");
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    URL.revokeObjectURL(url);
+    canvas.toBlob((blob) => {
+      const out = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = out;
+      a.download = "lao-phc-province-map.png";
+      a.click();
+      URL.revokeObjectURL(out);
+    });
   };
+  img.src = url;
 }
 
-function shortestAngle(from, to) {
-  return ((((to - from) % 360) + 540) % 360) - 180;
+function addMessage(role, text) {
+  const box = document.querySelector("#messages");
+  const div = document.createElement("div");
+  div.className = `message ${role}`;
+  div.textContent = text;
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
 }
 
-function toRad(value) {
-  return (value * Math.PI) / 180;
+function assistantReply(question) {
+  const q = question.toLowerCase();
+  const topPop = [...PROVINCES].sort((a, b) => b.pop2025 - a.pop2025)[0];
+  const youngest = [...PROVINCES].sort((a, b) => b.youth - a.youth)[0];
+  const connected = [...PROVINCES].sort((a, b) => b.internet - a.internet)[0];
+  const lagWater = [...PROVINCES].sort((a, b) => a.water - b.water)[0];
+  if (q.includes("young") || q.includes("youth") || q.includes("jeune")) {
+    return `${youngest.name} has the youngest profile in this synthetic demo, with ${youngest.youth}% of residents under 30. A production dashboard would validate this with official PHC age-sex tables.`;
+  }
+  if (q.includes("population") || q.includes("largest") || q.includes("plus peupl")) {
+    return `${topPop.name} is the largest province in the demo at ${fmt(topPop.pop2025, "pop2025")} people. National synthetic total is ${fmt(national("pop2025"), "pop2025")}.`;
+  }
+  if (q.includes("internet") || q.includes("digital")) {
+    return `${connected.name} leads on internet access in the demo (${connected.internet}%). This supports a digital-divide view for census dissemination and service planning.`;
+  }
+  if (q.includes("water") || q.includes("service")) {
+    return `${lagWater.name} has the lowest improved-water value in the demo (${lagWater.water}%). The dashboard can surface these gaps by province, district, urban/rural, and ethnicity.`;
+  }
+  if (q.includes("privacy") || q.includes("microdata") || q.includes("confidential")) {
+    return "The prototype follows the TOR privacy covenant: it exposes aggregated macro indicators only. No individual microdata rows, PII, or small-cell records are served to the browser.";
+  }
+  if (q.includes("export") || q.includes("download") || q.includes("csv") || q.includes("pdf")) {
+    return "Use the export dock to download CSV, JSON, and map PNG. The PDF path is handled through the Print/PDF button, which creates an executive-ready snapshot.";
+  }
+  return "Try asking: highest population, youngest province, internet access, water service gaps, privacy safeguards, or export formats. I answer from the aggregated demo data currently loaded.";
 }
 
-function range(start, end, step) {
-  const values = [];
-  for (let value = start; value <= end; value += step) values.push(value);
-  return values;
+function setupAssistant() {
+  const prompts = ["Youngest province?", "Largest population?", "Privacy safeguards?", "Export formats?"];
+  document.querySelector("#quickPrompts").innerHTML = prompts.map((p) => `<button type="button">${p}</button>`).join("");
+  document.querySelectorAll("#quickPrompts button").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      addMessage("user", btn.textContent);
+      addMessage("bot", assistantReply(btn.textContent));
+    });
+  });
+  addMessage("bot", "Hello. I am a local prototype assistant. Ask me about the census indicators, province rankings, privacy, or exports.");
 }
 
-function formatPercent(value) {
-  if (value === null || value === undefined || Number.isNaN(Number(value))) return "-";
-  return `${Number(value).toFixed(1)}%`;
+function bindEvents() {
+  document.querySelector("#indicatorSelect").addEventListener("change", (e) => { state.indicator = e.target.value; renderAll(); });
+  document.querySelector("#provinceSelect").addEventListener("change", (e) => { state.province = e.target.value; state.district = "all"; renderAll(); });
+  document.querySelector("#districtSelect").addEventListener("change", (e) => { state.district = e.target.value; renderAll(); });
+  document.querySelector("#sexSelect").addEventListener("change", (e) => { state.sex = e.target.value; renderAll(); });
+  document.querySelector("#areaSelect").addEventListener("change", (e) => { state.area = e.target.value; renderAll(); });
+  document.querySelector("#ethnoSelect").addEventListener("change", (e) => { state.ethno = e.target.value; renderAll(); });
+  document.querySelector("#searchInput").addEventListener("input", (e) => { state.search = e.target.value; renderAll(); });
+  document.querySelector("#rowDimSelect").addEventListener("change", (e) => { state.rowDim = e.target.value; renderCrosstab(); });
+  document.querySelector("#colDimSelect").addEventListener("change", (e) => { state.colDim = e.target.value; renderCrosstab(); });
+  document.querySelector("#measureSelect").addEventListener("change", (e) => { state.measure = e.target.value; renderCrosstab(); });
+  document.querySelector("#resetBtn").addEventListener("click", () => {
+    Object.assign(state, { indicator: "pop2025", province: "all", district: "all", sex: "all", area: "all", ethno: "all", search: "" });
+    document.querySelector("#searchInput").value = "";
+    renderAll();
+  });
+  document.querySelector("#downloadCsvBtn").addEventListener("click", () => download("lao-phc-dashboard-demo.csv", toCsv(exportRows()), "text/csv;charset=utf-8"));
+  document.querySelector("#downloadJsonBtn").addEventListener("click", () => download("lao-phc-dashboard-demo.json", JSON.stringify(exportRows(), null, 2), "application/json"));
+  document.querySelector("#downloadMapPngBtn").addEventListener("click", downloadMapPng);
+  document.querySelector("#printBtn").addEventListener("click", () => window.print());
+  document.querySelector("#copyTableBtn").addEventListener("click", async () => {
+    await navigator.clipboard.writeText(document.querySelector("#crosstabTable").innerText);
+    document.querySelector("#copyTableBtn").textContent = "Copied";
+    setTimeout(() => renderAll(), 900);
+  });
+  document.querySelector("#langEn").addEventListener("click", () => { state.lang = "en"; renderAll(); });
+  document.querySelector("#langLo").addEventListener("click", () => { state.lang = "lo"; renderAll(); });
+  document.querySelector("#assistantToggle").addEventListener("click", () => {
+    const panel = document.querySelector("#assistantPanel");
+    panel.classList.toggle("open");
+    document.querySelector("#assistantToggle").setAttribute("aria-expanded", panel.classList.contains("open"));
+  });
+  document.querySelector("#assistantClose").addEventListener("click", () => document.querySelector("#assistantPanel").classList.remove("open"));
+  document.querySelector("#demoQuestionBtn").addEventListener("click", () => {
+    document.querySelector("#assistantPanel").classList.add("open");
+    document.querySelector("#assistantInput").focus();
+  });
+  document.querySelector("#assistantForm").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const input = document.querySelector("#assistantInput");
+    const q = input.value.trim();
+    if (!q) return;
+    addMessage("user", q);
+    addMessage("bot", assistantReply(q));
+    input.value = "";
+  });
 }
 
-function formatNumber(value) {
-  return new Intl.NumberFormat("en").format(Number(value || 0));
-}
-
-function clamp(value, min, max) {
-  return Math.max(min, Math.min(max, value));
-}
-
-function escapeHtml(value) {
-  return String(value)
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-}
-
-function escapeAttr(value) {
-  return escapeHtml(value).replace(/`/g, "&#096;");
-}
-
-function displayCountry(value) {
-  if (value === "Cote dIvoire") return "Cote d'Ivoire";
-  return value;
-}
+renderHeroDots();
+renderAll();
+setupAssistant();
+bindEvents();

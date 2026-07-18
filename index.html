@@ -3,281 +3,275 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Afrobarometer 2026 Flagship Dashboard Prototype</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&family=Oswald:wght@500;600;700&display=swap" rel="stylesheet" />
+    <title>Lao PDR 2025 PHC Dashboard Prototype</title>
+    <meta
+      name="description"
+      content="Interactive prototype for the Lao PDR 2025 Population and Housing Census online dissemination dashboard."
+    />
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
-    <div class="shell">
-      <header class="topbar" aria-label="Dashboard header">
-        <a class="brand" href="#overview" aria-label="Dashboard home">
-          <span class="brand-mark" aria-hidden="true">
-            <span></span>
-          </span>
-          <span class="brand-copy">
-            <strong>AFRO</strong>
-            <em>BAROMETER</em>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#dashboard" aria-label="Go to dashboard">
+          <span class="brand-mark" aria-hidden="true">5</span>
+          <span>
+            <strong data-i18n="brandTitle">Lao PHC 2025</strong>
+            <em data-i18n="brandSub">Online Census Dissemination Dashboard</em>
           </span>
         </a>
 
-        <nav class="topnav" aria-label="Prototype navigation">
-          <a href="#overview">Overview</a>
-          <a href="#explore">Explore</a>
-          <a href="#compare">Compare</a>
-          <a href="#methodology">Methodology</a>
+        <nav class="topnav" aria-label="Primary navigation">
+          <a href="#dashboard" data-i18n="navDashboard">Dashboard</a>
+          <a href="#explore" data-i18n="navExplore">Explore</a>
+          <a href="#crosstab" data-i18n="navCrosstab">Cross-tab</a>
+          <a href="#handover" data-i18n="navHandover">Delivery</a>
         </nav>
 
-        <div class="prototype-pill" aria-label="Prototype status">
-          <span></span>
-          Live prototype
+        <div class="top-actions">
+          <button class="icon-button" id="printBtn" type="button" title="Print or save as PDF" aria-label="Print or save as PDF">
+            PDF
+          </button>
+          <div class="lang-switch" aria-label="Language switch">
+            <button class="active" id="langEn" type="button">EN</button>
+            <button id="langLo" type="button">LO</button>
+          </div>
         </div>
       </header>
 
       <main>
-        <section class="intro" id="overview">
-          <div class="intro-copy">
-            <p class="eyebrow">Afrobarometer interactive dashboard concept</p>
-            <h1>2026 Flagship Report intelligence room</h1>
-            <p>
-              A public-facing data experience that lets users move from a continental view to country evidence,
-              demographic patterns, regional detail, and export-ready outputs in a few clicks.
+        <section class="hero" id="dashboard">
+          <div class="hero-copy">
+            <p class="eyebrow" data-i18n="heroEyebrow">Official dissemination prototype</p>
+            <h1 data-i18n="heroTitle">From digital census data to decisions everyone can use.</h1>
+            <p data-i18n="heroBody">
+              A high-level web prototype for Lao Statistics Bureau and UNFPA: GIS drill-down, population pyramid,
+              trend comparison, confidential aggregated tables, exports, bilingual labels, and an embedded data assistant.
             </p>
+            <div class="hero-actions">
+              <a class="primary-action" href="#explore" data-i18n="heroCta">Open live dashboard</a>
+              <button class="secondary-action" id="demoQuestionBtn" type="button" data-i18n="heroAsk">Ask the data assistant</button>
+            </div>
           </div>
 
-          <aside class="globe-card" aria-label="Selected country globe">
-            <div class="globe-stage">
-              <canvas id="globeCanvas" width="520" height="520" aria-label="Rotating globe focused on selected country"></canvas>
-              <div class="globe-glow" aria-hidden="true"></div>
+          <div class="hero-visual" aria-label="Lao PDR census operations overview">
+            <svg viewBox="0 0 580 600" role="img" aria-labelledby="heroMapTitle">
+              <title id="heroMapTitle">Stylized Lao PDR operational map</title>
+              <defs>
+                <linearGradient id="river" x1="0" x2="1" y1="0" y2="1">
+                  <stop offset="0" stop-color="#00a5b5" />
+                  <stop offset="1" stop-color="#0076a8" />
+                </linearGradient>
+                <filter id="softShadow" x="-20%" y="-20%" width="140%" height="140%">
+                  <feDropShadow dx="0" dy="22" stdDeviation="22" flood-color="#001c30" flood-opacity=".18" />
+                </filter>
+              </defs>
+              <path
+                class="laos-silhouette"
+                d="M271 24c45 31 47 75 22 112 47 23 78 70 74 126-3 38-19 66-5 104 16 44 79 80 63 124-16 45-82 38-116 13-29-22-36-62-72-75-41-15-91 9-122-26-28-32 4-68 1-104-3-34-38-62-30-101 9-44 58-49 86-79 31-32 39-75 99-94z"
+                filter="url(#softShadow)"
+              />
+              <path class="mekong" d="M364 78c-51 48-54 97-27 148 31 59 15 102 51 150 23 31 62 50 58 103" />
+              <g id="heroProvinceDots"></g>
+            </svg>
+            <div class="hero-stats">
+              <div>
+                <span data-i18n="heroStat1Label">Enumerators</span>
+                <strong>12,000</strong>
+              </div>
+              <div>
+                <span data-i18n="heroStat2Label">Provinces</span>
+                <strong>18</strong>
+              </div>
+              <div>
+                <span data-i18n="heroStat3Label">Target coverage</span>
+                <strong>95%+</strong>
+              </div>
             </div>
-            <div class="globe-caption">
-              <p class="eyebrow">Globe focus</p>
-              <h2 id="globeCountry">Loading</h2>
-              <p id="globeMeta">The globe rotates toward the selected country.</p>
-            </div>
-          </aside>
+          </div>
         </section>
 
-        <section class="command-strip" aria-label="Dashboard summary">
+        <section class="status-strip" aria-label="Dashboard status">
           <div>
-            <span>Dataset</span>
-            <strong id="statusCountryCount">Loading data</strong>
+            <span data-i18n="statusSource">Data mode</span>
+            <strong data-i18n="statusSynthetic">Synthetic aggregated demo</strong>
           </div>
           <div>
-            <span>Selected metric</span>
-            <strong id="storyMetric">Right direction</strong>
+            <span data-i18n="statusSecurity">Privacy</span>
+            <strong data-i18n="statusPrivacy">No microdata exposed</strong>
           </div>
           <div>
-            <span>Country rank</span>
-            <strong id="storyRank">-</strong>
+            <span data-i18n="statusStack">Production target</span>
+            <strong>PostgreSQL + PostGIS + GeoJSON</strong>
           </div>
           <div>
-            <span>Comparison gap</span>
-            <strong id="storyDelta">-</strong>
+            <span data-i18n="statusDelivery">TOR window</span>
+            <strong>Aug-Nov 2026</strong>
           </div>
         </section>
 
         <section class="workspace" id="explore">
           <aside class="filters" aria-label="Dashboard filters">
-            <div class="filter-heading">
-              <span>Refine view</span>
-              <button id="resetBtn" type="button">Reset</button>
+            <div class="panel-heading">
+              <div>
+                <p class="eyebrow" data-i18n="filtersEyebrow">Global filters</p>
+                <h2 data-i18n="filtersTitle">Subset the census</h2>
+              </div>
+              <button class="text-button" id="resetBtn" type="button" data-i18n="reset">Reset</button>
             </div>
 
             <label>
-              Indicator
-              <select id="metricSelect"></select>
+              <span data-i18n="indicator">Indicator</span>
+              <select id="indicatorSelect"></select>
             </label>
-
             <label>
-              Focus country
-              <select id="countrySelect"></select>
+              <span data-i18n="province">Province</span>
+              <select id="provinceSelect"></select>
             </label>
-
             <label>
-              Compare with
-              <select id="compareSelect"></select>
+              <span data-i18n="district">District</span>
+              <select id="districtSelect"></select>
             </label>
-
             <label>
-              Segment
-              <select id="segmentSelect">
-                <option value="Gender">Gender</option>
-                <option value="Urban-rural">Urban-rural</option>
-                <option value="Age group">Age group</option>
-              </select>
+              <span data-i18n="sex">Sex</span>
+              <select id="sexSelect"></select>
             </label>
-
             <label>
-              Search country
-              <input id="searchInput" type="search" placeholder="e.g. Malawi, Ghana, Togo" />
+              <span data-i18n="area">Urban / rural</span>
+              <select id="areaSelect"></select>
+            </label>
+            <label>
+              <span data-i18n="ethno">Ethno-linguistic typology</span>
+              <select id="ethnoSelect"></select>
+            </label>
+            <label>
+              <span data-i18n="search">Search</span>
+              <input id="searchInput" type="search" placeholder="Vientiane, Luang Prabang, Savannakhet" />
             </label>
 
-            <div class="active-filters" id="activeFilters" aria-live="polite"></div>
-
-            <div class="tool-dock" aria-label="Export tools">
-              <strong>Export toolkit</strong>
-              <button class="ghost-button" id="printReportBtn" type="button">Print / PDF</button>
-              <button class="solid-button" id="downloadCsvBtn" type="button">Download CSV</button>
-            </div>
-
-            <div class="filter-note">
-              <strong>Source note</strong>
-              <p>Prototype values are calculated from public Afrobarometer Round 10 CSV files and weighted with <code>withinwt_hh</code>.</p>
+            <div class="download-dock">
+              <strong data-i18n="exports">Exports</strong>
+              <button id="downloadCsvBtn" type="button" data-i18n="downloadCsv">Download CSV</button>
+              <button id="downloadJsonBtn" type="button" data-i18n="downloadJson">Download JSON</button>
+              <button id="downloadMapPngBtn" type="button" data-i18n="downloadMap">Download map PNG</button>
             </div>
           </aside>
 
-          <section class="dashboard-panel">
-            <div class="kpi-row" id="kpiRow" aria-label="Key indicators"></div>
+          <section class="dashboard-main">
+            <div class="kpi-grid" id="kpiGrid"></div>
 
-            <div class="main-grid">
+            <div class="dashboard-grid">
               <article class="map-panel">
-                <div class="panel-title">
+                <div class="panel-heading">
                   <div>
-                    <p class="eyebrow">Geographic view</p>
-                    <h2>Country distribution</h2>
+                    <p class="eyebrow" data-i18n="mapEyebrow">GIS-ready view</p>
+                    <h2 data-i18n="mapTitle">Province choropleth</h2>
                   </div>
-                  <button class="text-button" id="downloadMapBtn" type="button">Export map SVG</button>
+                  <span class="chip" id="selectedScope">National</span>
                 </div>
-                <div id="mapContainer" class="map-container" aria-label="Interactive Africa map"></div>
+                <div class="map-wrap">
+                  <svg id="laoMap" viewBox="0 0 460 900" role="img" aria-label="Interactive Lao province map"></svg>
+                </div>
                 <div class="legend" id="mapLegend"></div>
               </article>
 
-              <article class="ranking-panel">
-                <div class="panel-title">
+              <article class="insight-panel">
+                <div class="panel-heading">
                   <div>
-                    <p class="eyebrow">Country ranking</p>
-                    <h2 id="rankingTitle">Indicator ranking</h2>
+                    <p class="eyebrow" data-i18n="insightEyebrow">Executive one-page</p>
+                    <h2 data-i18n="insightTitle">Headline intelligence</h2>
                   </div>
-                  <span class="data-count" id="rankingCount"></span>
                 </div>
-                <div class="ranking-list" id="rankingList"></div>
+                <div class="insight-list" id="insightList"></div>
               </article>
             </div>
 
             <div class="analytics-grid">
-              <article class="chart-panel">
-                <div class="panel-title">
+              <article>
+                <div class="panel-heading">
                   <div>
-                    <p class="eyebrow">Distribution</p>
-                    <h2>Indicator spread</h2>
+                    <p class="eyebrow" data-i18n="pyramidEyebrow">Age and sex</p>
+                    <h2 data-i18n="pyramidTitle">Population pyramid</h2>
                   </div>
                 </div>
-                <div id="distributionChart" class="chart-box"></div>
+                <div id="pyramidChart" class="chart"></div>
               </article>
 
-              <article class="chart-panel">
-                <div class="panel-title">
+              <article>
+                <div class="panel-heading">
                   <div>
-                    <p class="eyebrow">Relationship</p>
-                    <h2>Economy vs living conditions</h2>
+                    <p class="eyebrow" data-i18n="trendEyebrow">2015 vs 2025</p>
+                    <h2 data-i18n="trendTitle">Change over time</h2>
                   </div>
                 </div>
-                <div id="scatterChart" class="chart-box"></div>
+                <div id="trendChart" class="chart"></div>
               </article>
             </div>
           </section>
         </section>
 
-        <section class="compare-section" id="compare">
-          <article class="country-profile">
-            <div class="panel-title">
-              <div>
-                <p class="eyebrow">Country profile</p>
-                <h2 id="profileTitle">Malawi</h2>
-              </div>
-              <span id="profileMeta" class="data-count"></span>
-            </div>
-            <div class="profile-bars" id="profileBars"></div>
-          </article>
-
-          <article class="comparison-panel">
-            <div class="panel-title">
-              <div>
-                <p class="eyebrow">Side-by-side</p>
-                <h2 id="compareTitle">Country comparison</h2>
-              </div>
-            </div>
-            <div id="compareBars" class="compare-bars"></div>
-          </article>
-
-          <article class="segment-panel">
-            <div class="panel-title">
-              <div>
-                <p class="eyebrow">Disaggregation</p>
-                <h2 id="segmentTitle">Segments</h2>
-              </div>
-            </div>
-            <div id="segmentBars" class="segment-bars"></div>
-          </article>
-
-          <article class="region-panel">
-            <div class="panel-title">
-              <div>
-                <p class="eyebrow">Regional detail</p>
-                <h2 id="regionTitle">Regions</h2>
-              </div>
-            </div>
-            <div class="region-table-wrap">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Region</th>
-                    <th id="regionMetricHead">Value</th>
-                    <th>Base</th>
-                  </tr>
-                </thead>
-                <tbody id="regionRows"></tbody>
-              </table>
-            </div>
-          </article>
-        </section>
-
-        <section class="insights-section">
-          <div>
-            <p class="eyebrow">Generated reading guide</p>
-            <h2>What the dashboard is saying</h2>
-          </div>
-          <div id="insights" class="insights"></div>
-        </section>
-
-        <section class="methodology" id="methodology">
-          <div class="method-copy">
-            <p class="eyebrow">Methodology and handover</p>
-            <h2>Built for public exploration and editorial control</h2>
-            <p>
-              The final production dashboard would connect to Afrobarometer-approved datasets, codebooks, brand guidance,
-              hosting constraints, and launch content for the 2026 Flagship Report.
+        <section class="crosstab-section" id="crosstab">
+          <div class="section-heading">
+            <p class="eyebrow" data-i18n="crosstabEyebrow">Technical users</p>
+            <h2 data-i18n="crosstabTitle">Custom cross-tabulation builder</h2>
+            <p data-i18n="crosstabBody">
+              Build publication-safe aggregated tables by dimension and indicator. Production data would be generated from approved tabulation matrices only.
             </p>
           </div>
 
-          <div class="method-grid">
-            <div>
-              <span>01</span>
-              <strong>Data integrity</strong>
-              <p>Weighted indicators, codebook-backed labels, visible methodology notes, and exportable data tables.</p>
-            </div>
-            <div>
-              <span>02</span>
-              <strong>Accessible UX</strong>
-              <p>Keyboard-friendly controls, high contrast, responsive layout, clear labels, and nontechnical navigation.</p>
-            </div>
-            <div>
-              <span>03</span>
-              <strong>Maintainable delivery</strong>
-              <p>Static-friendly architecture with future CMS/API integration, documentation, and knowledge transfer.</p>
-            </div>
+          <div class="crosstab-tools">
+            <label>
+              <span data-i18n="rows">Rows</span>
+              <select id="rowDimSelect"></select>
+            </label>
+            <label>
+              <span data-i18n="columns">Columns</span>
+              <select id="colDimSelect"></select>
+            </label>
+            <label>
+              <span data-i18n="measure">Measure</span>
+              <select id="measureSelect"></select>
+            </label>
+            <button class="primary-action compact" id="copyTableBtn" type="button" data-i18n="copyTable">Copy table</button>
+          </div>
+
+          <div class="table-wrap">
+            <table id="crosstabTable"></table>
           </div>
         </section>
+
+        <section class="handover" id="handover">
+          <div class="section-heading">
+            <p class="eyebrow" data-i18n="handoverEyebrow">TOR alignment</p>
+            <h2 data-i18n="handoverTitle">Built to answer the 32-day assignment.</h2>
+          </div>
+          <div class="timeline" id="timeline"></div>
+        </section>
       </main>
+
+      <aside class="assistant-panel" id="assistantPanel" aria-label="Data assistant">
+        <button class="assistant-toggle" id="assistantToggle" type="button" aria-expanded="false">
+          <span data-i18n="assistantToggle">Data assistant</span>
+        </button>
+        <div class="assistant-window" aria-live="polite">
+          <div class="assistant-head">
+            <div>
+              <strong data-i18n="assistantTitle">Census data assistant</strong>
+              <span data-i18n="assistantSub">Ask about indicators, exports, privacy, or provinces.</span>
+            </div>
+            <button id="assistantClose" type="button" aria-label="Close assistant">x</button>
+          </div>
+          <div class="quick-prompts" id="quickPrompts"></div>
+          <div class="messages" id="messages"></div>
+          <form class="assistant-form" id="assistantForm">
+            <input id="assistantInput" type="text" autocomplete="off" placeholder="Which province has the youngest population?" />
+            <button type="submit" data-i18n="send">Send</button>
+          </form>
+        </div>
+      </aside>
     </div>
 
-    <div class="toast" id="toast" role="status" aria-live="polite"></div>
-    <div class="data-tooltip" id="dataTooltip" role="tooltip" aria-hidden="true"></div>
-    <script src="./vendor/d3.v7.min.js"></script>
-    <script src="./vendor/topojson-client.min.js"></script>
     <script src="./app.js"></script>
   </body>
 </html>

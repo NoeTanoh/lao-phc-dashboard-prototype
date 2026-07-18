@@ -1,6 +1,23 @@
-# Afrobarometer 2026 Flagship Dashboard Prototype
+# Lao PDR 2025 PHC Online Dashboard Prototype
 
-A polished interactive dashboard prototype prepared for the Afrobarometer 2026 Flagship Report RFQ response.
+Interactive static web prototype for the UNFPA Lao PDR / Lao Statistics Bureau 2025 Population and Housing Census dashboard TOR.
+
+## What this demonstrates
+
+- Executive one-page indicators for policymakers.
+- Province-level GIS-style choropleth map with drill-down behavior.
+- Dynamic filters by province, district, sex, urban/rural, and ethno-linguistic typology.
+- Population pyramid by 5-year age group and sex.
+- 2015 vs 2025 trend comparison.
+- Custom cross-tabulation builder.
+- CSV, JSON, PNG, and print/PDF export paths.
+- Lao/English language switch architecture.
+- Embedded rule-based chatbot/data assistant.
+- Privacy-first demo: only aggregated synthetic indicators are exposed.
+
+## Data note
+
+The prototype uses generated, aggregated demonstration data aligned with public UNFPA Lao PDR census themes. It does not contain official 2025 PHC microdata or personally identifiable information. In production, these arrays should be replaced by LSB-approved aggregated tabulation matrices and official GeoJSON/shapefile layers.
 
 ## Run locally
 
@@ -8,33 +25,12 @@ A polished interactive dashboard prototype prepared for the Afrobarometer 2026 F
 python -m http.server 5174
 ```
 
-Then open:
+Open:
 
 ```text
 http://localhost:5174
 ```
 
-## What is included
+## Deploy
 
-- Full public-facing dashboard interface.
-- Animated globe that rotates toward the selected country.
-- Country map, ranking, profile, side-by-side comparison, segment breakdown, regional table.
-- Distribution chart and economy-vs-living-conditions scatter plot.
-- Search, filters, CSV export, SVG map export, print/PDF support.
-- Responsive desktop/mobile layout.
-- Dashboard-ready data in `data/processed/round10_dashboard_data.json`.
-- Technical offer documents under `output/offer/`.
-
-## Data note
-
-The prototype uses public Afrobarometer Round 10 CSV files prepared for demonstration. Production delivery should replace prototype metrics with Afrobarometer-approved final 2026 Flagship Report indicators, labels, data files, and hosting requirements.
-
-## Proposal artifacts
-
-- `output/offer/offre-technique-afrobarometer.md`
-- `output/offer/offre-technique-afrobarometer.docx`
-- `output/offer/offre-technique-afrobarometer.pdf`
-
-## Deployment
-
-This is a static website. It can be deployed on Netlify, Vercel, Cloudflare Pages, GitHub Pages, or any static web server.
+This is a static site and can be deployed directly to GitHub Pages from the repository root.
