@@ -10,7 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from app.scrapers import scan_all
+from app.scrapers import load_sources, scan_all
 
 WEB_DIR = ROOT / "web"
 PUBLIC_DIR = ROOT / "public"
@@ -37,6 +37,7 @@ def main() -> None:
     payload = {
         "generated_at": generated_at,
         "items": static_items,
+        "source_directory": load_sources().get("platform_directory", {}),
         "scans": [
             {
                 "id": 1,

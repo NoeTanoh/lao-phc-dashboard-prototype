@@ -231,9 +231,16 @@ ONSITE_TERMS = [
     "must be based in",
     "based in office",
     "office-based",
+    "full-time office",
+    "in-office",
     "relocation required",
+    "requires being onsite",
+    "required onsite",
     "no remote",
     "not remote",
+    "remote work not considered",
+    "remote not considered",
+    "must spend at least",
 ]
 
 
@@ -252,7 +259,17 @@ def normalize(value: str | None) -> str:
 
 def classify_remote(title: str, location: str, description: str) -> tuple[str, bool]:
     text = normalize(" ".join([title or "", location or "", description or ""]))
-    if any(term in text for term in ["no remote", "not remote", "remote option is not available"]):
+    hard_onsite = [
+        "no remote",
+        "not remote",
+        "remote option is not available",
+        "remote work not considered",
+        "remote not considered",
+        "requires being onsite",
+        "must spend at least 50% of their time in-office",
+        "must be present in these locations",
+    ]
+    if any(term in text for term in hard_onsite):
         return "onsite", False
     if any(term in text for term in ONSITE_TERMS) and not any(term in text for term in REMOTE_TERMS):
         return "onsite", False

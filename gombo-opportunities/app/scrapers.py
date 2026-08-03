@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Callable
@@ -34,6 +35,9 @@ def scan_all() -> tuple[list[dict[str, Any]], list[str], int]:
         ("remoteok", scrape_remoteok),
         ("jobicy", scrape_jobicy),
         ("arbeitnow", scrape_arbeitnow),
+        ("himalayas", scrape_himalayas),
+        ("themuse", scrape_themuse),
+        ("rss_feeds", scrape_rss_feeds),
         ("reliefweb", scrape_reliefweb),
         ("lever", scrape_lever),
         ("greenhouse", scrape_greenhouse),
@@ -237,6 +241,126 @@ def scrape_arbeitnow(config: dict[str, Any]) -> list[dict[str, Any]]:
     return items
 
 
+def scrape_himalayas(config: dict[str, Any]) -> list[dict[str, Any]]:
+    items: list[dict[str, Any]] = []
+    for query in config.get("queries", []):
+        for page in range(1, int(config.get("pages_per_query", 2)) + 1):
+            response = requests.get(
+                "https://himalayas.app/jobs/api/search",
+                params={"q": query, "worldwide": "true", "sort": "recent", "page": page},
+                headers=HEADERS,
+                timeout=30,
+            )
+            response.raise_for_status()
+            jobs = response.json().get("jobs", [])
+            if not jobs:
+                break
+            for job in jobs:
+                restrictions = job.get("locationRestrictions") or []
+                location = "Worldwide" if not restrictions else ", ".join(country.get("name", "") for country in restrictions if country.get("name"))
+                items.append(
+                    {
+                        "source": "Himalayas",
+                        "title": job.get("title"),
+                        "organization": job.get("companyName"),
+                        "location": location or "Remote",
+                        "deadline": epoch_auto_to_iso(job.get("expiryDate")),
+                        "posted_at": epoch_auto_to_iso(job.get("pubDate")),
+                        "url": job.get("applicationLink") or job.get("guid"),
+                        "description": job.get("description"),
+                        "summary": job.get("excerpt") or BeautifulSoup(job.get("description") or "", "html.parser").get_text(" ", strip=True)[:350],
+                        "opportunity_type": job.get("employmentType") or "job",
+                    }
+                )
+    return items
+
+
+def scrape_themuse(config: dict[str, Any]) -> list[dict[str, Any]]:
+    items: list[dict[str, Any]] = []
+    for request_config in config.get("requests", []):
+        for page in range(1, int(request_config.get("pages", 2)) + 1):
+            params = {"page": page}
+            if request_config.get("category"):
+                params["category"] = request_config["category"]
+            if request_config.get("location"):
+                params["location"] = request_config["location"]
+            response = requests.get(
+                "https://www.themuse.com/api/public/jobs",
+                params=params,
+                headers=HEADERS,
+                timeout=30,
+            )
+            response.raise_for_status()
+            payload = response.json()
+            for job in payload.get("results", []):
+                locations = ", ".join(place.get("name", "") for place in job.get("locations", []) if place.get("name"))
+                categories = ", ".join(category.get("name", "") for category in job.get("categories", []) if category.get("name"))
+                company = job.get("company") or {}
+                items.append(
+                    {
+                        "source": "The Muse",
+                        "title": job.get("name"),
+                        "organization": company.get("name"),
+                        "location": locations or "Remote",
+                        "posted_at": job.get("publication_date"),
+                        "url": (job.get("refs") or {}).get("landing_page"),
+                        "description": " ".join([categories, job.get("contents") or ""]),
+                        "summary": BeautifulSoup(job.get("contents") or "", "html.parser").get_text(" ", strip=True)[:350],
+                        "opportunity_type": job.get("type") or "job",
+                    }
+                )
+            if page >= int(payload.get("page_count", page)):
+                break
+    return items
+
+
+def scrape_rss_feeds(config: dict[str, Any]) -> list[dict[str, Any]]:
+    items: list[dict[str, Any]] = []
+    keywords = [keyword.lower() for keyword in config.get("keywords", [])]
+    for feed in config.get("feeds", []):
+        try:
+            response = requests.get(feed["url"], headers={**HEADERS, "Accept": "application/rss+xml,application/xml,text/xml,*/*"}, timeout=30)
+            response.raise_for_status()
+            root = ET.fromstring(response.content)
+        except Exception:
+            continue
+        channel_items = root.findall(".//item")
+        for entry in channel_items:
+            title = xml_text(entry, "title")
+            description = xml_text(entry, "description")
+            category = xml_text(entry, "category")
+            haystack = " ".join([title, description, category]).lower()
+            if keywords and not any(keyword in haystack for keyword in keywords):
+                continue
+            organization, clean_title = split_title(title)
+            items.append(
+                {
+                    "source": feed.get("name") or "RSS",
+                    "title": clean_title,
+                    "organization": organization,
+                    "location": xml_text(entry, "region") or "Remote",
+                    "posted_at": xml_text(entry, "pubDate"),
+                    "url": xml_text(entry, "link") or xml_text(entry, "guid"),
+                    "description": " ".join([category, description]),
+                    "summary": BeautifulSoup(description, "html.parser").get_text(" ", strip=True)[:350],
+                    "opportunity_type": feed.get("type") or "job",
+                }
+            )
+    return items
+
+
+def xml_text(entry: ET.Element, tag: str) -> str:
+    found = entry.find(tag)
+    return found.text.strip() if found is not None and found.text else ""
+
+
+def split_title(title: str) -> tuple[str, str]:
+    if ":" not in title:
+        return "", title
+    organization, role = title.split(":", 1)
+    return organization.strip(), role.strip()
+
+
 def scrape_reliefweb(config: dict[str, Any]) -> list[dict[str, Any]]:
     items: list[dict[str, Any]] = []
     for query in config.get("queries", []):
@@ -373,18 +497,20 @@ def scrape_ashby(config: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 def epoch_ms_to_iso(value: Any) -> str | None:
-    if not value:
-        return None
+    return epoch_auto_to_iso(value, assume_ms=True)
 
 
 def epoch_seconds_to_iso(value: Any) -> str | None:
+    return epoch_auto_to_iso(value, assume_ms=False)
+
+
+def epoch_auto_to_iso(value: Any, assume_ms: bool | None = None) -> str | None:
     if not value:
         return None
     try:
-        return datetime.fromtimestamp(int(value), tz=timezone.utc).isoformat(timespec="seconds")
-    except (TypeError, ValueError, OSError):
-        return None
-    try:
-        return datetime.fromtimestamp(int(value) / 1000, tz=timezone.utc).isoformat(timespec="seconds")
+        numeric = int(value)
+        if assume_ms is True or (assume_ms is None and numeric > 10_000_000_000):
+            numeric = numeric / 1000
+        return datetime.fromtimestamp(numeric, tz=timezone.utc).isoformat(timespec="seconds")
     except (TypeError, ValueError, OSError):
         return None

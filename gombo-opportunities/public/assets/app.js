@@ -9,6 +9,7 @@ const state = {
   selectedId: null,
   loading: false,
   staticMode: false,
+  sourceDirectory: {},
 };
 
 const statusLabels = {
@@ -56,6 +57,7 @@ async function loadData() {
   const data = await fetchData(params);
   state.items = applyLocalFilters(data.items || []);
   state.scans = data.scans || [];
+  state.sourceDirectory = data.source_directory || {};
   if (!state.selectedId && state.items[0]) state.selectedId = state.items[0].id;
   if (!state.items.some((item) => item.id === state.selectedId)) state.selectedId = state.items[0]?.id || null;
   renderAll();
@@ -134,6 +136,7 @@ function renderAll() {
   renderList();
   renderDetail();
   renderScanMeta();
+  renderSourceDirectory();
 }
 
 function renderLoading() {
@@ -241,6 +244,31 @@ function renderScanMeta() {
   const errors = scan.errors?.length ? ` - ${scan.errors.length} source(s) en erreur` : "";
   const mode = state.staticMode ? " - GitHub Pages" : "";
   byId("scanMeta").textContent = `Dernier scan : ${finished} - ${scan.found_count} trouvees${errors}${mode}`;
+}
+
+function renderSourceDirectory() {
+  const target = byId("sourceDirectory");
+  if (!target) return;
+  const groups = Object.entries(state.sourceDirectory || {});
+  if (!groups.length) {
+    target.innerHTML = "";
+    return;
+  }
+  target.innerHTML = groups
+    .map(([group, links]) => `<div class="source-group">
+      <strong>${escapeHtml(formatSourceGroup(group))}</strong>
+      <div>${links.map((link) => `<a href="${escapeAttribute(link.url)}" target="_blank" rel="noreferrer">${escapeHtml(link.name)}</a>`).join("")}</div>
+    </div>`)
+    .join("");
+}
+
+function formatSourceGroup(group) {
+  return {
+    remote_job_boards: "Jobs remote monde",
+    freelance_consultance: "Freelance / consultance",
+    development_procurement: "Developpement international",
+    africa_cote_ivoire: "Afrique / Cote d'Ivoire",
+  }[group] || group.replaceAll("_", " ");
 }
 
 function readLocalStatuses() {

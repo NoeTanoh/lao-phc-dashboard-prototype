@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gombo Opportunities</title>
     <meta name="description" content="Veille personnelle des opportunites remote en data, BI, dashboards et suivi-evaluation." />
-    <link rel="stylesheet" href="/assets/styles.css" />
+    <link rel="stylesheet" href="./assets/styles.css" />
   </head>
   <body>
     <div class="app-shell">
@@ -46,7 +46,7 @@
           </div>
           <div class="actions">
             <button id="scanBtn" class="primary" type="button">Scanner maintenant</button>
-            <a class="button" href="/api/export.csv">Exporter CSV</a>
+            <a class="button" href="./data/opportunities.json">Exporter JSON</a>
           </div>
         </header>
 
@@ -95,9 +95,19 @@
             <div id="detailContent" class="hidden"></div>
           </aside>
         </section>
+
+        <section class="source-directory-section">
+          <div class="section-head">
+            <div>
+              <h2>Plateformes complementaires</h2>
+              <p>Sources utiles a ouvrir directement quand l'automatisation est limitee par login, anti-bot ou API payante.</p>
+            </div>
+          </div>
+          <div id="sourceDirectory" class="source-directory"></div>
+        </section>
       </main>
     </div>
 
-    <script src="/assets/app.js"></script>
+    <script src="./assets/app.js"></script>
   </body>
 </html>

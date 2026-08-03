@@ -24,6 +24,16 @@ def test_onsite_only_is_rejected():
     assert not is_remote
 
 
+def test_remote_work_not_considered_is_rejected():
+    remote_type, is_remote = classify_remote(
+        "Power BI Analyst",
+        "Houston, TX",
+        "This position requires being onsite. Remote work not considered.",
+    )
+    assert remote_type == "onsite"
+    assert not is_remote
+
+
 def test_general_software_engineer_has_no_profile_anchor():
     assert not has_profile_anchor("Staff Software Engineer", "Build product APIs with Python and SQL.")
 

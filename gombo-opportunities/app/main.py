@@ -10,7 +10,7 @@ from fastapi.responses import HTMLResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 
-from .scrapers import scan_all
+from .scrapers import load_sources, scan_all
 from .storage import (
     finish_scan,
     list_opportunities,
@@ -48,6 +48,7 @@ def opportunities(
     return {
         "items": list_opportunities(status=status, track=track, domain=domain, min_score=min_score, query=q),
         "scans": recent_scans(5),
+        "source_directory": load_sources().get("platform_directory", {}),
     }
 
 

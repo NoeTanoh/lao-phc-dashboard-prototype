@@ -273,7 +273,8 @@ input[type="range"] {
 }
 
 .list-panel,
-.detail-panel {
+.detail-panel,
+.source-directory-section {
   min-width: 0;
   background: var(--panel);
   border: 1px solid rgba(23, 33, 43, 0.1);
@@ -282,6 +283,11 @@ input[type="range"] {
 }
 
 .list-panel {
+  padding: 0.9rem;
+}
+
+.source-directory-section {
+  margin-top: 0.85rem;
   padding: 0.9rem;
 }
 
@@ -490,6 +496,47 @@ input[type="range"] {
   gap: 0.45rem;
 }
 
+.source-directory {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1px;
+  overflow: hidden;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+
+.source-group {
+  min-height: 150px;
+  padding: 0.85rem;
+  background: #fff;
+}
+
+.source-group strong {
+  display: block;
+  margin-bottom: 0.55rem;
+}
+
+.source-group div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.source-group a {
+  display: inline-flex;
+  min-height: 30px;
+  align-items: center;
+  padding: 0.28rem 0.48rem;
+  border: 1px solid #bfdedb;
+  border-radius: 999px;
+  color: var(--accent-dark);
+  background: #eff9f7;
+  font-size: 0.75rem;
+  font-weight: 850;
+  text-decoration: none;
+}
+
 .empty-list,
 .empty-detail {
   display: grid;
@@ -507,7 +554,8 @@ input[type="range"] {
 
 @media (max-width: 1120px) {
   .app-shell,
-  .content-grid {
+  .content-grid,
+  .source-directory {
     grid-template-columns: 1fr;
   }
 

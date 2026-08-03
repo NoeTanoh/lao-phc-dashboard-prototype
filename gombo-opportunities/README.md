@@ -59,12 +59,18 @@ Les sources sont configurees dans `app/sources.json` :
 - RemoteOK API
 - Jobicy API
 - Arbeitnow API
+- Himalayas API
+- The Muse API
+- We Work Remotely RSS
+- JobsCollider RSS
 - ReliefWeb API
 - Lever boards publics
 - Greenhouse boards publics
 - Ashby boards publics
 
-Les sites difficiles ou risqués a scraper comme LinkedIn sont volontairement evites dans le MVP. On peut ajouter d'autres sources propres au fur et a mesure.
+La plateforme inclut aussi un annuaire de plateformes complementaires : LinkedIn, Indeed, Upwork, Freelancer, Contra, Malt, Toptal, UNGM, UNDP, World Bank, DevelopmentAid, Devex, ReliefWeb, UNICEF, Impactpool, Emploi.ci, Educarriere, Jobberman et MyJobMag.
+
+Les sites difficiles ou risqués a scraper directement sont ouverts comme liens de recherche plutot que scrapes en silence, surtout quand ils exigent un login, bloquent les robots, ou imposent une API payante. L'automatisation couvre en priorite les sources publiques/API/RSS stables.
 
 ## Donnees
 
