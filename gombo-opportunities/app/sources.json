@@ -1,0 +1,81 @@
+{
+  "minimum_score": 35,
+  "remotive": {
+    "enabled": true,
+    "queries": [
+      "power bi",
+      "dashboard",
+      "data analyst",
+      "business intelligence",
+      "data visualization",
+      "analytics engineer",
+      "data engineer",
+      "monitoring evaluation"
+    ]
+  },
+  "remoteok": {
+    "enabled": true,
+    "keywords": [
+      "power bi",
+      "dashboard",
+      "business intelligence",
+      "data analyst",
+      "data scientist",
+      "sql",
+      "python",
+      "analytics"
+    ]
+  },
+  "jobicy": {
+    "enabled": true,
+    "requests": [
+      { "industry": "data-science", "count": 50 },
+      { "tag": "power bi", "count": 30 },
+      { "tag": "dashboard", "count": 30 },
+      { "tag": "data analyst", "count": 30 },
+      { "tag": "business intelligence", "count": 30 }
+    ]
+  },
+  "arbeitnow": {
+    "enabled": true,
+    "pages": 3,
+    "keywords": [
+      "power bi",
+      "dashboard",
+      "business intelligence",
+      "data analyst",
+      "data scientist",
+      "data engineer",
+      "analytics engineer",
+      "tableau",
+      "looker"
+    ]
+  },
+  "reliefweb": {
+    "enabled": false,
+    "queries": [
+      "\"Power BI\" OR dashboard OR \"data visualization\"",
+      "\"information management\" dashboard remote",
+      "\"monitoring and evaluation\" dashboard remote"
+    ]
+  },
+  "lever": {
+    "enabled": true,
+    "companies": [
+      "remofirst",
+      "superside"
+    ]
+  },
+  "greenhouse": {
+    "enabled": false,
+    "boards": [
+      "example"
+    ]
+  },
+  "ashby": {
+    "enabled": false,
+    "boards": [
+      "example"
+    ]
+  }
+}
