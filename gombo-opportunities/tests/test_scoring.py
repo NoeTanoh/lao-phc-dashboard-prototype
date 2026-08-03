@@ -46,3 +46,13 @@ def test_me_job_is_classified_apart():
     )
     assert track == "emploi-data"
     assert domain == "suivi-evaluation-etudes"
+
+
+def test_communication_consultance_is_classified_apart():
+    track, domain = classify_track_domain(
+        "Digital communications consultant",
+        "consultancy",
+        "Prepare social media content, campaign assets, infographics and publications.",
+    )
+    assert track == "consultance"
+    assert domain == "communication"

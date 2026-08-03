@@ -49,7 +49,7 @@ Le workflow GitHub Actions `.github/workflows/gombo-opportunities.yml` execute l
 https://noetanoh.github.io/lao-phc-dashboard-prototype/gombo-opportunities/public/
 ```
 
-Le cron GitHub est regle sur `05:30 UTC`, soit `07:30` a Abidjan/Paris pendant l'heure d'ete europeenne. Il peut aussi etre lance manuellement depuis l'onglet Actions.
+Le cron GitHub est regle sur `05:30 UTC`, soit `07:30` a Paris pendant l'heure d'ete europeenne. Il peut aussi etre lance manuellement depuis l'onglet Actions.
 
 ## Sources actuelles
 

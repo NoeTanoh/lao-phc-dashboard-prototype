@@ -57,7 +57,13 @@ def scan_all() -> tuple[list[dict[str, Any]], list[str], int]:
         if not item or item["url"] in seen_urls:
             continue
         seen_urls.add(item["url"])
-        if item["is_remote"] and item["score"] >= config.get("minimum_score", 35) and has_profile_anchor(item["title"], item["description"]):
+        consultancy_match = item["track"] == "consultance" and item["domain"] in {
+            "data-bi",
+            "suivi-evaluation-etudes",
+            "developpement-app",
+            "communication",
+        }
+        if item["is_remote"] and item["score"] >= config.get("minimum_score", 35) and (has_profile_anchor(item["title"], item["description"]) or consultancy_match):
             normalized.append(item)
 
     return normalized, errors, source_count
@@ -75,6 +81,9 @@ def normalize_item(item: dict[str, Any]) -> dict[str, Any] | None:
     summary = clean_text(item.get("summary")) or description[:280]
     opportunity_type = item.get("opportunity_type") or infer_type(title, description)
     track, domain = classify_track_domain(title, opportunity_type, description)
+    if track == "consultance" and domain in {"developpement-app", "communication", "suivi-evaluation-etudes"}:
+        score = min(100, score + 12)
+        keywords = sorted(set([*keywords, domain, "consultance"]))
     return {
         "title": title,
         "organization": organization,

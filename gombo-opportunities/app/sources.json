@@ -10,7 +10,10 @@
       "data visualization",
       "analytics engineer",
       "data engineer",
-      "monitoring evaluation"
+      "monitoring evaluation",
+      "consultant dashboard",
+      "web application consultant",
+      "communications consultant"
     ]
   },
   "remoteok": {
@@ -33,7 +36,10 @@
       { "tag": "power bi", "count": 30 },
       { "tag": "dashboard", "count": 30 },
       { "tag": "data analyst", "count": 30 },
-      { "tag": "business intelligence", "count": 30 }
+      { "tag": "business intelligence", "count": 30 },
+      { "tag": "communications consultant", "count": 30 },
+      { "tag": "web developer consultant", "count": 30 },
+      { "tag": "application consultant", "count": 30 }
     ]
   },
   "arbeitnow": {
@@ -48,7 +54,10 @@
       "data engineer",
       "analytics engineer",
       "tableau",
-      "looker"
+      "looker",
+      "communications",
+      "web application",
+      "consultant"
     ]
   },
   "reliefweb": {
